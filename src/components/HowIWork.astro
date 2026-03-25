@@ -1,0 +1,351 @@
+---
+// HowIWork.astro
+// "How I Work" three-card section with a bottom CTA.
+// Used on: /services
+---
+
+<section class="how-i-work" aria-labelledby="how-heading">
+
+  <!-- Section header -->
+  <div class="section-header">
+    <span class="label-tag">The Process</span>
+    <h2 id="how-heading">How I Work</h2>
+    <p class="section-intro">
+      No jargon. No confusion. Just a clear process that puts your team in control.
+    </p>
+  </div>
+
+  <!-- Three-card grid -->
+  <div class="card-grid" role="list">
+
+    <!-- ── Card 1: The Deep Dive ── -->
+    <article class="card card--one" role="listitem">
+      <div class="card-inner">
+        <span class="step-number" aria-hidden="true">01</span>
+
+        <!-- Conversation / Ear icon -->
+        <div class="icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <!-- Primary speech bubble -->
+            <path d="M6 8C6 5.79 7.79 4 10 4H32C34.21 4 36 5.79 36 8V26C36 28.21 34.21 30 32 30H20L12 38V30H10C7.79 30 6 28.21 6 26V8Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Listening lines inside bubble -->
+            <line x1="13" y1="14" x2="29" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="13" y1="20" x2="24" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <!-- Second bubble (reply) -->
+            <path d="M36 18H38C40.21 18 42 19.79 42 22V32C42 34.21 40.21 36 38 36H36V41L31 36H29" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="card-content">
+          <h3 class="card-heading">The Deep Dive</h3>
+          <p class="card-body">
+            Every engagement starts with me <strong>listening</strong>. I ask plain questions about your team, your tools, and where the real friction is. No templates. No assumptions. Just an honest conversation about what you actually need.
+          </p>
+        </div>
+      </div>
+      <div class="card-bar" aria-hidden="true"></div>
+    </article>
+
+    <!-- ── Card 2: The Blueprint ── -->
+    <article class="card card--two" role="listitem">
+      <div class="card-inner">
+        <span class="step-number" aria-hidden="true">02</span>
+
+        <!-- Lightbulb icon -->
+        <div class="icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <!-- Bulb body -->
+            <path d="M24 4C16.27 4 10 10.27 10 18C10 22.8 12.4 27.04 16 29.72V34C16 35.1 16.9 36 18 36H30C31.1 36 32 35.1 32 34V29.72C35.6 27.04 38 22.8 38 18C38 10.27 31.73 4 24 4Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Base -->
+            <line x1="18" y1="40" x2="30" y2="40" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="20" y1="44" x2="28" y2="44" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Inner filament lines -->
+            <line x1="20" y1="30" x2="28" y2="30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="20" y1="33" x2="28" y2="33" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <!-- Shine rays -->
+            <line x1="24" y1="1" x2="24" y2="0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="7" y1="10" x2="5.5" y2="8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="41" y1="10" x2="42.5" y2="8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="card-content">
+          <h3 class="card-heading">The Blueprint</h3>
+          <p class="card-body">
+            I turn what I learn into a <strong>clear, plain-English plan</strong>. No jargon. No fluff. You will know exactly what we are building, why it matters, and what winning looks like — before any work begins.
+          </p>
+        </div>
+      </div>
+      <div class="card-bar" aria-hidden="true"></div>
+    </article>
+
+    <!-- ── Card 3: The Shield ── -->
+    <article class="card card--three" role="listitem">
+      <div class="card-inner">
+        <span class="step-number" aria-hidden="true">03</span>
+
+        <!-- Shield icon -->
+        <div class="icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <!-- Shield body -->
+            <path d="M24 4L8 10V24C8 32.84 15.18 41.16 24 44C32.82 41.16 40 32.84 40 24V10L24 4Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Checkmark inside -->
+            <polyline points="16,24 21,30 32,18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="card-content">
+          <h3 class="card-heading">The Shield</h3>
+          <p class="card-body">
+            We implement the plan <strong>together</strong>. I train your team, secure your systems, and hand over every tool — so when our engagement ends, you own it completely. No dependency. No black box.
+          </p>
+        </div>
+      </div>
+      <div class="card-bar" aria-hidden="true"></div>
+    </article>
+
+  </div>
+
+  <!-- Bottom CTA -->
+  <div class="section-cta" role="complementary" aria-label="Contact call to action">
+    <div class="cta-rule" aria-hidden="true"></div>
+    <p class="cta-headline">Ready to simplify your business?</p>
+    <p class="cta-sub">Let&rsquo;s talk.</p>
+    <a href="/contact" class="cta-btn" aria-label="Get in touch — navigate to contact form">
+      Start the Conversation
+      <span aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+
+</section>
+
+<style>
+  /* ────────────────────────────────────────────────
+     Section wrapper
+  ──────────────────────────────────────────────── */
+  .how-i-work {
+    width: 100%;
+    padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 4rem);
+    background: var(--color-charcoal);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3.5rem;
+  }
+
+  /* ────────────────────────────────────────────────
+     Section header
+  ──────────────────────────────────────────────── */
+  .section-header {
+    text-align: center;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.875rem;
+  }
+
+  .label-tag {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
+  }
+
+  .section-header h2 {
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--color-off-white);
+    letter-spacing: -0.01em;
+  }
+
+  .section-intro {
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    color: rgba(245, 245, 240, 0.65);
+    line-height: 1.75;
+    max-width: 520px;
+  }
+
+  /* ────────────────────────────────────────────────
+     Card grid — 3 columns → 1 column on mobile
+  ──────────────────────────────────────────────── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  @media (max-width: 900px) {
+    .card-grid {
+      grid-template-columns: 1fr;
+      max-width: 540px;
+    }
+  }
+
+  /* ────────────────────────────────────────────────
+     Individual cards
+  ──────────────────────────────────────────────── */
+  .card {
+    position: relative;
+    background: #232323;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(201, 168, 76, 0.2);
+  }
+
+  /* Gold left-bar accent */
+  .card-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--color-gold);
+    border-radius: 6px 0 0 6px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .card:hover .card-bar {
+    opacity: 1;
+  }
+
+  .card-inner {
+    padding: 2rem 1.75rem 2rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+    flex: 1;
+  }
+
+  /* Step number */
+  .step-number {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--color-gold);
+    opacity: 0.6;
+  }
+
+  /* Icon wrapper */
+  .icon-wrap {
+    color: var(--color-gold);
+    line-height: 0;
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover .icon-wrap {
+    transform: scale(1.06);
+  }
+
+  /* Card text */
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .card-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(1.2rem, 2vw, 1.375rem);
+    font-weight: 800;
+    color: var(--color-gold);
+    letter-spacing: -0.01em;
+  }
+
+  .card-body {
+    font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
+    color: rgba(245, 245, 240, 0.78);
+    line-height: 1.75;
+  }
+
+  .card-body strong {
+    color: var(--color-off-white);
+    font-weight: 600;
+  }
+
+  /* ────────────────────────────────────────────────
+     Bottom CTA
+  ──────────────────────────────────────────────── */
+  .section-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+    padding-top: 1rem;
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .cta-rule {
+    width: 56px;
+    height: 2px;
+    background: var(--color-gold);
+    border-radius: 2px;
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+  }
+
+  .cta-headline {
+    font-family: var(--font-heading);
+    font-size: clamp(1.625rem, 3.5vw, 2.375rem);
+    font-weight: 800;
+    color: var(--color-off-white);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  .cta-sub {
+    font-family: var(--font-heading);
+    font-size: clamp(1.375rem, 2.5vw, 1.875rem);
+    font-weight: 700;
+    color: var(--color-gold);
+    letter-spacing: -0.01em;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    background: var(--color-gold);
+    color: var(--color-charcoal);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.9rem 2.25rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: filter 0.15s ease, transform 0.15s ease;
+  }
+
+  .cta-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+
+  .cta-btn:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+</style>

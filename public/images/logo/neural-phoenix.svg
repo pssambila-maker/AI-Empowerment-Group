@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 110" fill="none" role="img" aria-label="AI Empowerment Group — Neural Phoenix">
+  <defs>
+    <!-- Left-to-right gradient matching the original logo: navy → mid-blue → cyan -->
+    <linearGradient id="wg" gradientUnits="userSpaceOnUse" x1="70" y1="0" x2="210" y2="0">
+      <stop offset="0%"   stop-color="#2A4FAA"/>
+      <stop offset="45%"  stop-color="#1E7FD4"/>
+      <stop offset="100%" stop-color="#00C8E8"/>
+    </linearGradient>
+  </defs>
+
+  <g stroke="url(#wg)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+
+    <!-- ── BODY: stacked geometric diamonds ── -->
+    <polygon points="140,28 131,40 140,52 149,40" stroke-width="2"/>
+    <polygon points="140,52 131,64 140,76 149,64" stroke-width="2"/>
+
+    <!-- ── HEAD: small diamond + beak ── -->
+    <polygon points="140,16 134,23 140,28 146,23" stroke-width="2"/>
+    <line x1="146" y1="21" x2="153" y2="18" stroke-width="1.8"/>
+
+    <!-- ── LEFT WING ── -->
+    <!-- Upper main branch -->
+    <polyline points="132,40 114,26 95,16" stroke-width="2"/>
+    <circle cx="95"  cy="16" r="3" fill="url(#wg)" stroke="none"/>
+    <!-- Sub up from mid -->
+    <line x1="114" y1="26" x2="103" y2="10" stroke-width="2"/>
+    <circle cx="103" cy="10" r="3" fill="url(#wg)" stroke="none"/>
+    <!-- Sub across from mid -->
+    <line x1="114" y1="26" x2="99"  y2="32" stroke-width="2"/>
+    <circle cx="99"  cy="32" r="3" fill="url(#wg)" stroke="none"/>
+    <!-- Lower branch -->
+    <polyline points="132,40 112,46 92,46" stroke-width="2"/>
+    <circle cx="92"  cy="46" r="3" fill="url(#wg)" stroke="none"/>
+    <!-- Sub down from lower mid -->
+    <line x1="112" y1="46" x2="106" y2="57" stroke-width="2"/>
+    <circle cx="106" cy="57" r="3" fill="url(#wg)" stroke="none"/>
+
+    <!-- ── RIGHT WING (mirror) ── -->
+    <!-- Upper main branch -->
+    <polyline points="148,40 166,26 185,16" stroke-width="2"/>
+    <circle cx="185" cy="16" r="3" fill="url(#wg)" stroke="none"/>
+    <!-- Sub up from mid -->
+    <line x1="166" y1="26" x2="177" y2="10" stroke-width="2"/>
+    <circle cx="177" cy="10" r="3" fill="url(#wg)" stroke="none"/>
+    <!-- Sub across from mid -->
+    <line x1="166" y1="26" x2="181" y2="32" stroke-width="2"/>
+    <circle cx="181" cy="32" r="3" fill="url(#wg)" stroke="none"/>
+    <!-- Lower branch -->
+    <polyline points="148,40 168,46 188,46" stroke-width="2"/>
+    <circle cx="188" cy="46" r="3" fill="url(#wg)" stroke="none"/>
+    <!-- Sub down from lower mid -->
+    <line x1="168" y1="46" x2="174" y2="57" stroke-width="2"/>
+    <circle cx="174" cy="57" r="3" fill="url(#wg)" stroke="none"/>
+
+    <!-- ── TAIL / LEGS ── -->
+    <polyline points="140,76 131,86 123,94" stroke-width="2"/>
+    <circle cx="123" cy="94" r="3" fill="url(#wg)" stroke="none"/>
+    <line x1="131" y1="86" x2="127" y2="94" stroke-width="2"/>
+    <circle cx="127" cy="94" r="2" fill="url(#wg)" stroke="none"/>
+
+    <line x1="140" y1="76" x2="140" y2="94" stroke-width="2"/>
+    <circle cx="140" cy="94" r="3" fill="url(#wg)" stroke="none"/>
+
+    <polyline points="140,76 149,86 157,94" stroke-width="2"/>
+    <circle cx="157" cy="94" r="3" fill="url(#wg)" stroke="none"/>
+    <line x1="149" y1="86" x2="153" y2="94" stroke-width="2"/>
+    <circle cx="153" cy="94" r="2" fill="url(#wg)" stroke="none"/>
+
+  </g>
+
+  <!-- ── WORDMARK ── -->
+  <text
+    x="150"
+    y="108"
+    font-family="Montserrat, Arial Black, sans-serif"
+    font-weight="800"
+    font-size="13.5"
+    fill="#FFFFFF"
+    letter-spacing="2.5"
+    text-anchor="middle"
+  >AI EMPOWERMENT GROUP</text>
+
+</svg>

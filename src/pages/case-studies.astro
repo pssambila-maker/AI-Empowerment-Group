@@ -1,0 +1,106 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const studies = [
+  {
+    sector: "Data",
+    icon: "chart",
+    title: "Tableau Server Migration",
+    challenge: "A mid-size logistics firm was running an end-of-life Tableau Server on-premises. Dashboards were slow, IT overhead was high, and the data team had no reliable backup strategy.",
+    approach: "Audited the existing environment and catalogued 140+ workbooks. Built a phased migration plan to Tableau Cloud, retrained the data team on cloud-native features, and decommissioned the legacy server with zero data loss.",
+    result: "Dashboard load times reduced by 68%. IT maintenance overhead cut by 12 hours per week. Full team reskilled in under 3 weeks.",
+  },
+  {
+    sector: "AI",
+    icon: "brain",
+    title: "LLM Adoption for a Marketing Team",
+    challenge: "A marketing department of 18 people was overwhelmed by competing AI tools and unsure which were safe to use with client data. Productivity had not improved despite tool subscriptions.",
+    approach: "Ran a 2-day AI literacy workshop tailored to their specific workflows. Established a clear policy for what data could enter which tools. Built a library of reusable prompts for their five most common content tasks.",
+    result: "Content production time reduced by 40%. Team confidence self-rated 2.1/5 before the workshop, 4.4/5 after. Zero policy violations in the 6 months following.",
+  },
+  {
+    sector: "Cyber",
+    icon: "shield",
+    title: "Phishing Resilience Programme",
+    challenge: "A professional services firm with 60 staff had experienced two near-miss phishing incidents in one quarter. Senior leadership wanted awareness training but feared disrupting a busy team.",
+    approach: "Designed a 90-minute, scenario-based training session structured around real examples from their industry. Followed up with a simulated phishing campaign 4 weeks later to measure retention.",
+    result: "Phishing click-through rate dropped from 34% (baseline) to 6% (post-training). Zero successful phishing incidents in the 12 months following.",
+  },
+];
+---
+
+<Layout title="Case Studies" description="Real results from AI Empowerment Group. Challenge, Approach, Measurable Result.">
+
+  <header class="page-hero">
+    <div class="hero-inner">
+      <span class="label-tag">The Evidence</span>
+      <h1>Results That <em>Speak for Themselves.</em></h1>
+      <p class="hero-sub">Every case study follows one structure: the challenge, what we did, and what changed.</p>
+    </div>
+  </header>
+
+  <section class="studies-section" aria-label="Case studies">
+    <div class="studies-inner">
+      {studies.map((s, i) => (
+        <article class="study-card" aria-labelledby={`study-${i}`}>
+          <div class="study-header">
+            <span class="study-sector">{s.sector}</span>
+            <h2 id={`study-${i}`}>{s.title}</h2>
+          </div>
+          <div class="study-body">
+            <div class="study-block">
+              <h3><span class="block-label" aria-hidden="true">01</span> The Challenge</h3>
+              <p>{s.challenge}</p>
+            </div>
+            <div class="study-block">
+              <h3><span class="block-label" aria-hidden="true">02</span> The Strategic Approach</h3>
+              <p>{s.approach}</p>
+            </div>
+            <div class="study-result">
+              <h3><span class="block-label" aria-hidden="true">03</span> The Result</h3>
+              <p>{s.result}</p>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <div class="page-cta">
+    <p>Ready to be the next case study?</p>
+    <a href="/contact" class="btn-primary">Start the Conversation &rarr;</a>
+  </div>
+
+</Layout>
+
+<style>
+  .page-hero { background: linear-gradient(180deg, rgba(201,168,76,0.07) 0%, transparent 60%), var(--color-charcoal); border-bottom: 1px solid rgba(201,168,76,0.12); padding: clamp(4rem,8vw,6.5rem) clamp(1.25rem,5vw,4rem) clamp(3rem,5vw,5rem); }
+  .hero-inner { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+  .label-tag { font-family: var(--font-heading); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-gold); border: 1px solid rgba(201,168,76,0.35); padding: 0.3rem 0.9rem; border-radius: 2px; align-self: flex-start; }
+  .page-hero h1 { font-family: var(--font-heading); font-size: clamp(2.25rem,5vw,3.5rem); font-weight: 800; color: var(--color-off-white); letter-spacing: -0.02em; line-height: 1.1; }
+  .page-hero h1 em { font-style: normal; color: var(--color-gold); }
+  .hero-sub { font-size: 1.0625rem; color: rgba(245,245,240,0.6); line-height: 1.75; }
+
+  .studies-section { padding: clamp(3.5rem,6vw,6rem) clamp(1.25rem,5vw,4rem); }
+  .studies-inner { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 3rem; }
+
+  .study-card { background: #222; border-radius: 8px; overflow: hidden; }
+  .study-header { background: linear-gradient(135deg, #1e1e1e, #252525); border-bottom: 1px solid rgba(201,168,76,0.15); padding: 1.75rem 2rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .study-sector { font-family: var(--font-heading); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-gold); }
+  .study-header h2 { font-family: var(--font-heading); font-size: clamp(1.25rem,2.5vw,1.625rem); font-weight: 800; color: var(--color-off-white); }
+
+  .study-body { padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem 2.5rem; }
+  @media (max-width: 680px) { .study-body { grid-template-columns: 1fr; } }
+
+  .study-result { grid-column: 1 / -1; background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: 6px; padding: 1.25rem 1.5rem; }
+
+  .study-block h3, .study-result h3 { font-family: var(--font-heading); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gold); margin-bottom: 0.625rem; display: flex; align-items: center; gap: 0.5rem; }
+  .block-label { opacity: 0.4; font-size: 0.625rem; }
+  .study-block p, .study-result p { font-size: 0.9375rem; color: rgba(245,245,240,0.72); line-height: 1.75; }
+  .study-result p { color: rgba(245,245,240,0.85); }
+
+  .page-cta { text-align: center; padding: 3rem clamp(1.25rem,5vw,4rem) clamp(4rem,7vw,6rem); display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+  .page-cta p { font-family: var(--font-heading); font-size: clamp(1.25rem,2.5vw,1.75rem); font-weight: 800; color: var(--color-off-white); }
+  .btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--color-gold); color: var(--color-charcoal); font-family: var(--font-heading); font-weight: 700; font-size: 0.875rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.875rem 2rem; border-radius: 4px; text-decoration: none; transition: filter 0.15s, transform 0.15s; }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); text-decoration: none; }
+</style>

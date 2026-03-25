@@ -1,0 +1,61 @@
+---
+/**
+ * NeuralPhoenixLogo.astro
+ *
+ * Renders the official AI Empowerment Group logo.
+ *
+ * Logo asset location:
+ *   public/images/logo/neural-phoenix.png  ← full logo (mark + wordmark)
+ *   public/images/logo/neural-phoenix-mark.png ← mark only (no text)
+ *
+ * The logo is a circuit-board phoenix with a navy→cyan gradient,
+ * geometric diamond body, and terminal nodes on the wing tips.
+ * Original logo background: white/transparent.
+ * Renders well on both Charcoal (#2D2D2D) and white backgrounds.
+ *
+ * Props:
+ *   height        — rendered height in px (width scales automatically)
+ *   markOnly      — use the mark-only version (no wordmark beneath)
+ *   withWordmark  — true = full logo (default), false = mark only
+ *   class         — additional CSS classes
+ */
+
+export interface Props {
+  height?: number;
+  markOnly?: boolean;
+  class?: string;
+}
+
+const {
+  height = 80,
+  markOnly = false,
+  class: className = "",
+} = Astro.props;
+
+// SVG used now; swap to .png when the final asset is placed in public/images/logo/
+const src = markOnly
+  ? "/images/logo/neural-phoenix-mark.svg"
+  : "/images/logo/neural-phoenix.png";
+
+const altText = "AI Empowerment Group — Neural Phoenix logo";
+---
+
+<img
+  src={src}
+  alt={altText}
+  height={height}
+  width="auto"
+  class:list={["neural-phoenix-logo", className]}
+  loading="eager"
+  decoding="async"
+/>
+
+<style>
+  .neural-phoenix-logo {
+    display: block;
+    width: auto;
+    /* mix-blend-mode: lighten makes the dark logo background
+       invisible on the charcoal site — only the gold elements show. */
+    mix-blend-mode: lighten;
+  }
+</style>

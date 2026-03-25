@@ -1,0 +1,50 @@
+Professional Build Plan: AI Empowerment Group
+Developer Persona: High-end AI Strategy & Data Science Consultant.
+
+1. Brand & Design Specs (The "Look")
+Color Palette: Charcoal Grey (Backgrounds/Text) + Warm Gold (Accents/Action Buttons). This creates a "premium" and "authoritative" feel.
+
+Typography: Large, clean Sans-Serif fonts (like Inter or Montserrat) for readability.
+
+Personality: "Approachable, Collaborative, and Technical."
+
+Alignment Logic: As seen in the video—use a split-column hero section. Left column right-aligned with gold accent bars; right column left-aligned text.
+
+2. The Site Map (7 Essential Pages)
+I have adapted the video's requirements to your specific career path:
+
+Homepage: Hero section with the headline "Unleash the Strength of AI." Visual focus on the "Neural Phoenix" or "Secure Spark" logo.
+
+Bio (The Expert): Focus on your Master’s in Data Science, your PhD journey, and your Cybersecurity 701 certification. This is the "Authority" page.
+
+Services: * AI Strategy & Training (Teaching teams how to use LLMs).
+
+Data Visualisation (Tableau Server & Desktop mastery, Microsoft PowerBi, Microsoft Fabric, Microsoft Foundry).
+
+Cyber Threat Hunting (Security awareness and protection).
+
+Section: "How I Work" (Explaining your 8th-grade-simple teaching philosophy).
+
+Case Studies (The Evidence): Structured exactly like the video: Challenge → Approach → Measurable Outcome. * Example: A case study on migrating Tableau users or identifying a security threat.
+
+Testimonials: A visually varied grid of quotes from past clients or colleagues.
+
+Contact: A tab-navigable form (Accessibility first). Include a "Country" dropdown and a "Nature of Inquiry" selector.
+
+Accessibility Statement: A dedicated footer page ensuring the site meets WCAG 2.1 standards (crucial for a tech consultant).
+
+3. Implementation Logic for Antigravity/Claude Code
+You should give these specific "Prompt Instructions" to your AI builder:
+
+Prompt 1 (Structure): "Build a multi-page site using Astro/Firebase. Implement a layout inspired by high-end London consultancies: Charcoal and Warm Gold theme. Ensure the navigation is clean with the Accessibility Statement moved to the footer."
+
+Prompt 2 (Case Studies): "Generate a 'Case Studies' page. For each entry, use a three-part structure: 'The Challenge,' 'The Strategic Approach,' and 'The Result.' Use icons to represent the data and security sectors."
+
+Prompt 3 (QA & Internal Linking): "Connect all 'Schedule a Consultation' buttons to the Contact page. Perform a full audit of the site's tab-navigation for accessibility and ensure all forms have clear success/error states."
+
+4. Hosting Strategy: Firebase Deployment
+Tooling: Use the firebase-tools CLI.
+
+Environment: Set up a preview channel in Firebase so you can test the "Antigravity" build before it goes live on aiempowermentgroup.com.
+
+Performance: Ensure the AI minifies all images and utilizes Firebase’s global CDN for sub-1-second loading.

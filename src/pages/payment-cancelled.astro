@@ -1,0 +1,36 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Payment Cancelled" description="Your checkout was cancelled. No charge was made.">
+  <main class="cancel-page" aria-label="Payment cancelled">
+    <div class="cancel-card">
+      <div class="cancel-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="48" height="48" fill="none">
+          <circle cx="24" cy="24" r="20" stroke="#C9A84C" stroke-width="2.5" opacity="0.4"/>
+          <line x1="16" y1="16" x2="32" y2="32" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="32" y1="16" x2="16" y2="32" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1>Checkout Cancelled</h1>
+      <p>No charge was made to your card. You can return to services whenever you're ready.</p>
+      <div class="cancel-actions">
+        <a href="/services" class="btn-primary">View Services</a>
+        <a href="/contact" class="btn-ghost">Talk to Us First</a>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .cancel-page { min-height: calc(100vh - 68px); display: grid; place-items: center; padding: 2rem; background: var(--color-charcoal); }
+  .cancel-card { max-width: 460px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+  .cancel-icon { margin-bottom: 0.5rem; }
+  h1 { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--color-off-white); }
+  p { font-size: 1rem; color: rgba(245,245,240,0.6); line-height: 1.7; }
+  .cancel-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem; }
+  .btn-primary { display: inline-flex; align-items: center; background: var(--color-gold); color: var(--color-charcoal); font-family: var(--font-heading); font-weight: 700; font-size: 0.875rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.8rem 1.75rem; border-radius: 4px; text-decoration: none; transition: filter 0.15s, transform 0.15s; }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); text-decoration: none; }
+  .btn-ghost { display: inline-flex; align-items: center; color: var(--color-mid-grey); font-size: 0.875rem; text-decoration: underline; text-underline-offset: 3px; }
+  .btn-ghost:hover { color: var(--color-off-white); }
+</style>

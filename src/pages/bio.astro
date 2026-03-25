@@ -1,0 +1,167 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Bio" description="Expert AI Strategy, Data Science and Cybersecurity consultant. MSc Data Science, PhD Candidate, CompTIA Security+ 701.">
+
+  <header class="page-hero">
+    <div class="hero-inner">
+      <span class="label-tag">The Expert</span>
+      <h1>Built on Depth.<br /><em>Delivered Simply.</em></h1>
+      <p class="hero-sub">
+        Credentials that open doors. A teaching style that keeps them open.
+      </p>
+    </div>
+  </header>
+
+  <section class="bio-section">
+    <div class="bio-inner">
+
+      <aside class="bio-sidebar">
+        <div class="credential-card">
+          <h2>Credentials</h2>
+          <ul class="cred-list" role="list">
+            <li>
+              <span class="cred-icon" aria-hidden="true">🎓</span>
+              <div>
+                <strong>MSc Data Science</strong>
+                <span>Graduate — distinction track</span>
+              </div>
+            </li>
+            <li>
+              <span class="cred-icon" aria-hidden="true">📖</span>
+              <div>
+                <strong>PhD — In Progress</strong>
+                <span>Data Science research programme</span>
+              </div>
+            </li>
+            <li>
+              <span class="cred-icon" aria-hidden="true">🔐</span>
+              <div>
+                <strong>CompTIA Security+ 701</strong>
+                <span>Cybersecurity certification</span>
+              </div>
+            </li>
+            <li>
+              <span class="cred-icon" aria-hidden="true">📊</span>
+              <div>
+                <strong>Tableau Certified</strong>
+                <span>Server &amp; Desktop specialist</span>
+              </div>
+            </li>
+            <li>
+              <span class="cred-icon" aria-hidden="true">☁️</span>
+              <div>
+                <strong>Microsoft Fabric</strong>
+                <span>Data platform &amp; Foundry</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <main class="bio-content">
+        <div class="bio-block">
+          <h2>Why I Do This</h2>
+          <p>
+            Most technology fails teams not because the technology is bad — but because nobody
+            explained it in plain English. I have spent years watching capable people feel
+            intimidated by tools that should be making their lives easier.
+          </p>
+          <p>
+            That is why my work starts with listening, not presenting. Every team is different.
+            Every challenge is specific. I do not arrive with a slide deck — I arrive with questions.
+          </p>
+        </div>
+
+        <div class="bio-block">
+          <h2>The Academic Foundation</h2>
+          <p>
+            My Master's in Data Science gave me the rigour to understand what the models are
+            actually doing beneath the surface. My ongoing PhD work keeps me at the frontier
+            of applied research — so what I bring to your team is not yesterday's thinking.
+          </p>
+          <p>
+            But academic depth means nothing without the ability to translate it. That is the
+            skill I have spent equal time developing: the ability to explain a complex concept
+            so clearly that anyone in the room understands it. If it takes jargon to explain it,
+            I do not understand it well enough yet.
+          </p>
+        </div>
+
+        <div class="bio-block">
+          <h2>The Security Layer</h2>
+          <p>
+            Holding the CompTIA Security+ 701 certification means I do not just help teams
+            use AI and data tools — I help them use those tools <em>safely</em>. In a world
+            where your data is one of your most valuable assets, every implementation I
+            deliver has security built in from the start, not bolted on at the end.
+          </p>
+        </div>
+
+        <div class="bio-block">
+          <h2>The Teaching Philosophy</h2>
+          <p>
+            I explain everything at an 8th-grade reading level. Not because the clients are
+            not intelligent — they are — but because clarity is a sign of respect. If I cannot
+            explain it simply, I have not understood it deeply enough.
+          </p>
+          <p>
+            The goal of every engagement is that when I leave, your team does not need me
+            anymore. That is what good teaching looks like.
+          </p>
+        </div>
+
+        <a href="/contact" class="bio-cta">
+          Work With Me <span aria-hidden="true">&rarr;</span>
+        </a>
+      </main>
+
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  .page-hero {
+    background: linear-gradient(180deg, rgba(201,168,76,0.07) 0%, transparent 60%), var(--color-charcoal);
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    padding: clamp(4rem, 8vw, 6.5rem) clamp(1.25rem, 5vw, 4rem) clamp(3rem, 5vw, 5rem);
+  }
+  .hero-inner { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.125rem; }
+  .label-tag {
+    font-family: var(--font-heading); font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-gold);
+    border: 1px solid rgba(201,168,76,0.35); padding: 0.3rem 0.9rem; border-radius: 2px; align-self: flex-start;
+  }
+  .page-hero h1 { font-family: var(--font-heading); font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: 800; color: var(--color-off-white); letter-spacing: -0.02em; line-height: 1.1; }
+  .page-hero h1 em { font-style: normal; color: var(--color-gold); }
+  .hero-sub { font-size: 1.0625rem; color: rgba(245,245,240,0.6); line-height: 1.75; }
+
+  .bio-section { padding: clamp(3.5rem, 6vw, 6rem) clamp(1.25rem, 5vw, 4rem); }
+  .bio-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 4rem; align-items: start; }
+  @media (max-width: 820px) { .bio-inner { grid-template-columns: 1fr; } }
+
+  .credential-card { background: #222; border-radius: 6px; border-top: 3px solid var(--color-gold); padding: 1.75rem; position: sticky; top: 100px; }
+  .credential-card h2 { font-family: var(--font-heading); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gold); margin-bottom: 1.25rem; }
+  .cred-list { list-style: none; display: flex; flex-direction: column; gap: 1.125rem; }
+  .cred-list li { display: flex; gap: 0.875rem; align-items: flex-start; }
+  .cred-icon { font-size: 1.125rem; flex-shrink: 0; margin-top: 2px; }
+  .cred-list strong { display: block; font-size: 0.9375rem; color: var(--color-off-white); font-weight: 600; }
+  .cred-list span { font-size: 0.8125rem; color: var(--color-mid-grey); }
+
+  .bio-content { display: flex; flex-direction: column; gap: 2.5rem; }
+  .bio-block { display: flex; flex-direction: column; gap: 0.875rem; }
+  .bio-block h2 { font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--color-gold); }
+  .bio-block p { font-size: clamp(0.9375rem, 1.2vw, 1.0625rem); color: rgba(245,245,240,0.72); line-height: 1.8; }
+  .bio-block p em { font-style: normal; color: var(--color-off-white); }
+
+  .bio-cta {
+    display: inline-flex; align-items: center; gap: 0.5rem; align-self: flex-start;
+    background: var(--color-gold); color: var(--color-charcoal); font-family: var(--font-heading);
+    font-weight: 700; font-size: 0.875rem; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.875rem 2rem; border-radius: 4px; text-decoration: none;
+    transition: filter 0.15s ease, transform 0.15s ease;
+  }
+  .bio-cta:hover { filter: brightness(1.1); transform: translateY(-1px); text-decoration: none; }
+</style>

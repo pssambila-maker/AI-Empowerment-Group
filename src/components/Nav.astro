@@ -1,0 +1,234 @@
+---
+const navLinks = [
+  { href: "/bio",          label: "Bio" },
+  { href: "/services",     label: "Services" },
+  { href: "/case-studies", label: "Case Studies" },
+  { href: "/testimonials", label: "Testimonials" },
+  { href: "/contact",      label: "Contact" },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-nav" role="banner">
+  <nav aria-label="Main navigation">
+    <a href="/" class="nav-logo" aria-label="AI Empowerment Group — Home">
+      <img
+        src="/images/logo/neural-phoenix.png"
+        alt="AI Empowerment Group"
+        height="44"
+        width="auto"
+        loading="eager"
+      />
+    </a>
+
+    <!-- Desktop links -->
+    <ul class="nav-links" role="list">
+      {navLinks.map(({ href, label }) => (
+        <li>
+          <a
+            href={href}
+            class:list={["nav-link", { active: currentPath.startsWith(href) }]}
+            aria-current={currentPath.startsWith(href) ? "page" : undefined}
+          >
+            {label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <a href="/login" class="nav-cta" aria-label="Client login portal">
+      Client Login
+    </a>
+
+    <!-- Mobile hamburger -->
+    <button
+      class="hamburger"
+      aria-label="Open navigation menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      id="hamburger-btn"
+    >
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="mobile-menu" aria-hidden="true" hidden>
+    <ul role="list">
+      {navLinks.map(({ href, label }) => (
+        <li>
+          <a
+            href={href}
+            class:list={["mobile-link", { active: currentPath.startsWith(href) }]}
+            aria-current={currentPath.startsWith(href) ? "page" : undefined}
+          >
+            {label}
+          </a>
+        </li>
+      ))}
+      <li>
+        <a href="/login" class="mobile-link mobile-login">Client Login</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById("hamburger-btn") as HTMLButtonElement;
+  const menu = document.getElementById("mobile-menu") as HTMLElement;
+
+  btn?.addEventListener("click", () => {
+    const isOpen = btn.getAttribute("aria-expanded") === "true";
+    btn.setAttribute("aria-expanded", String(!isOpen));
+    btn.setAttribute("aria-label", isOpen ? "Open navigation menu" : "Close navigation menu");
+    menu.hidden = isOpen;
+    menu.setAttribute("aria-hidden", String(isOpen));
+  });
+
+  // Close on outside click
+  document.addEventListener("click", (e) => {
+    if (!btn.contains(e.target as Node) && !menu.contains(e.target as Node)) {
+      btn.setAttribute("aria-expanded", "false");
+      btn.setAttribute("aria-label", "Open navigation menu");
+      menu.hidden = true;
+      menu.setAttribute("aria-hidden", "true");
+    }
+  });
+</script>
+
+<style>
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(45, 45, 45, 0.96);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+  }
+
+  nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 4vw, 3rem);
+    height: 68px;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .nav-logo {
+    flex-shrink: 0;
+    line-height: 0;
+  }
+
+  .nav-logo img {
+    height: 44px;
+    width: auto;
+    mix-blend-mode: lighten;
+  }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 0.25rem;
+    margin-left: auto;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(245, 245, 240, 0.7);
+    text-decoration: none;
+    border-radius: 3px;
+    transition: color 0.15s ease, background 0.15s ease;
+    letter-spacing: 0.01em;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--color-off-white);
+    background: rgba(201, 168, 76, 0.08);
+  }
+
+  .nav-link.active {
+    color: var(--color-gold);
+  }
+
+  .nav-cta {
+    flex-shrink: 0;
+    padding: 0.5rem 1.125rem;
+    border: 1.5px solid rgba(201, 168, 76, 0.5);
+    border-radius: 3px;
+    font-size: 0.8125rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-gold);
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .nav-cta:hover {
+    background: rgba(201, 168, 76, 0.1);
+    border-color: var(--color-gold);
+    text-decoration: none;
+  }
+
+  /* Hamburger */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-left: auto;
+  }
+
+  .bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-off-white);
+    border-radius: 2px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  /* Mobile menu */
+  .mobile-menu {
+    border-top: 1px solid rgba(201, 168, 76, 0.1);
+    background: var(--color-charcoal);
+    padding: 1rem clamp(1.25rem, 4vw, 3rem) 1.5rem;
+  }
+
+  .mobile-menu ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .mobile-link {
+    display: block;
+    padding: 0.75rem 0.5rem;
+    font-size: 1rem;
+    color: rgba(245, 245, 240, 0.75);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .mobile-link.active { color: var(--color-gold); }
+  .mobile-login { color: var(--color-gold); margin-top: 0.5rem; }
+
+  @media (max-width: 768px) {
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+  }
+</style>

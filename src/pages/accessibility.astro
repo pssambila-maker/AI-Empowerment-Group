@@ -1,0 +1,37 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Accessibility Statement" description="AI Empowerment Group accessibility statement. WCAG 2.1 Level AA compliance.">
+  <div class="page-wrap">
+    <div class="page-inner">
+      <header class="page-header">
+        <span class="label-tag">Legal</span>
+        <h1>Accessibility Statement</h1>
+        <p class="last-updated">Last updated: March 2026</p>
+      </header>
+
+      <main class="statement-body">
+        <section><h2>Our Commitment</h2><p>AI Empowerment Group is committed to ensuring that this website is accessible to all users, including those with disabilities. We aim to meet the <strong>Web Content Accessibility Guidelines (WCAG) 2.1 Level AA</strong> standard.</p></section>
+        <section><h2>Measures Taken</h2><ul><li>All navigation is fully operable via keyboard (Tab, Shift+Tab, Enter, Escape).</li><li>All images include descriptive alternative text.</li><li>All form fields have associated labels and clear error messages announced to screen readers.</li><li>Colour contrast ratios meet or exceed the WCAG 2.1 AA minimum of 4.5:1 for normal text.</li><li>The site does not rely on colour alone to convey information.</li><li>ARIA roles and attributes are used appropriately throughout.</li><li>Page titles are unique and descriptive.</li><li>The site is compatible with modern screen readers including NVDA, JAWS, and VoiceOver.</li></ul></section>
+        <section><h2>Known Limitations</h2><p>The client portal messaging interface (Phase 2) is currently under development. We are committed to ensuring it meets the same accessibility standard upon release.</p></section>
+        <section><h2>Feedback & Contact</h2><p>If you experience any accessibility barriers on this site, please <a href="/contact">contact us</a>. We aim to respond to all accessibility feedback within 2 business days.</p></section>
+        <section><h2>Technical Specification</h2><p>This site was built using Astro (static HTML output) with semantic HTML5, CSS custom properties, and no reliance on JavaScript for core content delivery. All interactive enhancements are progressively enhanced.</p></section>
+      </main>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page-wrap { padding: clamp(3.5rem,6vw,6rem) clamp(1.25rem,5vw,4rem); }
+  .page-inner { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 2.5rem; }
+  .page-header { display: flex; flex-direction: column; gap: 0.75rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(201,168,76,0.15); }
+  .label-tag { font-family: var(--font-heading); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-gold); border: 1px solid rgba(201,168,76,0.35); padding: 0.3rem 0.9rem; border-radius: 2px; align-self: flex-start; }
+  h1 { font-family: var(--font-heading); font-size: clamp(2rem,4vw,2.75rem); font-weight: 800; color: var(--color-off-white); }
+  .last-updated { font-size: 0.875rem; color: var(--color-mid-grey); }
+  .statement-body { display: flex; flex-direction: column; gap: 2rem; }
+  section h2 { font-family: var(--font-heading); font-size: 1.0625rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.75rem; }
+  section p, section li { font-size: 1rem; color: rgba(245,245,240,0.72); line-height: 1.8; }
+  section ul { list-style: disc; padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  section a { color: var(--color-gold); }
+</style>

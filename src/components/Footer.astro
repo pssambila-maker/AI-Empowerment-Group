@@ -1,0 +1,160 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+
+    <div class="footer-brand">
+      <a href="/" aria-label="AI Empowerment Group — Home">
+        <img
+          src="/images/logo/neural-phoenix.png"
+          alt="AI Empowerment Group"
+          height="48"
+          width="auto"
+          loading="lazy"
+        />
+      </a>
+      <p class="footer-tagline">
+        Unleashing the strength of AI — one team at a time.
+      </p>
+    </div>
+
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <div class="footer-col">
+        <h3>Services</h3>
+        <ul role="list">
+          <li><a href="/services#ai-strategy">AI Strategy &amp; Training</a></li>
+          <li><a href="/services#data-viz">Data Visualisation</a></li>
+          <li><a href="/services#cyber">Cyber Threat Hunting</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Company</h3>
+        <ul role="list">
+          <li><a href="/bio">About</a></li>
+          <li><a href="/case-studies">Case Studies</a></li>
+          <li><a href="/testimonials">Testimonials</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Contact</h3>
+        <ul role="list">
+          <li><a href="/contact">Schedule a Consultation</a></li>
+          <li><a href="/login">Client Login</a></li>
+          <li><a href="/accessibility">Accessibility Statement</a></li>
+        </ul>
+      </div>
+    </nav>
+
+  </div>
+
+  <div class="footer-base">
+    <p class="copyright">
+      &copy; {year} AI Empowerment Group. All rights reserved.
+    </p>
+    <p class="wcag-note">
+      This site meets <a href="/accessibility">WCAG 2.1 Level AA</a> standards.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: #1e1e1e;
+    border-top: 1px solid rgba(201, 168, 76, 0.15);
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 4rem) 2rem;
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem 4rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  @media (max-width: 760px) {
+    .footer-inner { grid-template-columns: 1fr; }
+  }
+
+  /* Brand column */
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .footer-brand img { height: 48px; width: auto; mix-blend-mode: lighten; }
+
+  .footer-tagline {
+    font-size: 0.875rem;
+    color: var(--color-mid-grey);
+    line-height: 1.6;
+    max-width: 240px;
+  }
+
+  /* Nav columns */
+  .footer-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  @media (max-width: 540px) {
+    .footer-nav { grid-template-columns: 1fr 1fr; }
+  }
+
+  .footer-col h3 {
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    margin-bottom: 0.875rem;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .footer-col a {
+    font-size: 0.875rem;
+    color: rgba(245, 245, 240, 0.55);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .footer-col a:hover { color: var(--color-off-white); }
+
+  /* Base bar */
+  .footer-base {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .copyright, .wcag-note {
+    font-size: 0.8125rem;
+    color: rgba(245, 245, 240, 0.3);
+  }
+
+  .wcag-note a {
+    color: rgba(201, 168, 76, 0.5);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .wcag-note a:hover { color: var(--color-gold); }
+</style>

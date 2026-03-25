@@ -1,0 +1,477 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="Home"
+  description="AI Empowerment Group — AI Strategy, Data Visualisation & Cybersecurity Consulting. Unleash the Strength of AI."
+>
+
+  <!-- ═══════════════════════════════════════
+       HERO — Split-column layout
+  ════════════════════════════════════════ -->
+  <section class="hero" aria-label="Hero">
+    <div class="hero-inner">
+
+      <!-- Left column -->
+      <div class="hero-left">
+        <div class="hero-accent-bar" aria-hidden="true"></div>
+        <div class="hero-left-content">
+          <span class="hero-label">AI Strategy · Data · Cybersecurity</span>
+          <h1 class="hero-heading">
+            Unleash the<br />
+            <em>Strength of AI.</em>
+          </h1>
+          <p class="hero-body">
+            I help teams cut through the noise and use AI, data, and
+            security tools with confidence — explained simply, implemented cleanly.
+          </p>
+          <div class="hero-actions">
+            <a href="/services" class="btn-primary">Explore Services</a>
+            <a href="/contact" class="btn-outline">Schedule a Call</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div class="hero-right" aria-hidden="true">
+        <div class="hero-logo-frame">
+          <img
+            src="/images/logo/neural-phoenix.png"
+            alt=""
+            class="hero-logo-img"
+            loading="eager"
+          />
+          <div class="hero-ring hero-ring--1"></div>
+          <div class="hero-ring hero-ring--2"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       TRUST BAR
+  ════════════════════════════════════════ -->
+  <div class="trust-bar" aria-label="Credentials">
+    <div class="trust-inner">
+      <span class="trust-item">MSc Data Science</span>
+      <span class="trust-dot" aria-hidden="true"></span>
+      <span class="trust-item">PhD Candidate</span>
+      <span class="trust-dot" aria-hidden="true"></span>
+      <span class="trust-item">CompTIA Security+ 701</span>
+      <span class="trust-dot" aria-hidden="true"></span>
+      <span class="trust-item">Tableau Certified</span>
+      <span class="trust-dot" aria-hidden="true"></span>
+      <span class="trust-item">Microsoft Fabric</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SERVICES PREVIEW
+  ════════════════════════════════════════ -->
+  <section class="services-preview" aria-labelledby="services-heading">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="label-tag">What I Do</span>
+        <h2 id="services-heading">Three Disciplines. One Clear Mission.</h2>
+        <p class="section-sub">Make complex technology simple for your team.</p>
+      </div>
+
+      <div class="preview-grid" role="list">
+
+        <article class="preview-card" role="listitem">
+          <div class="preview-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" width="36" height="36" fill="none">
+              <circle cx="24" cy="14" r="5" stroke="currentColor" stroke-width="2.5"/>
+              <circle cx="10" cy="34" r="5" stroke="currentColor" stroke-width="2.5"/>
+              <circle cx="38" cy="34" r="5" stroke="currentColor" stroke-width="2.5"/>
+              <line x1="20" y1="18" x2="13" y2="29" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <line x1="28" y1="18" x2="35" y2="29" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <line x1="15" y1="34" x2="33" y2="34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>AI Strategy &amp; Training</h3>
+          <p>Teaching your team to work <em>with</em> AI — from LLM workshops to governance frameworks.</p>
+          <a href="/services#ai-strategy" class="card-link" aria-label="Learn more about AI Strategy and Training">
+            Learn more <span aria-hidden="true">&rarr;</span>
+          </a>
+        </article>
+
+        <article class="preview-card" role="listitem">
+          <div class="preview-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" width="36" height="36" fill="none">
+              <rect x="6" y="28" width="8" height="14" rx="1.5" stroke="currentColor" stroke-width="2.5"/>
+              <rect x="20" y="18" width="8" height="24" rx="1.5" stroke="currentColor" stroke-width="2.5"/>
+              <rect x="34" y="8" width="8" height="34" rx="1.5" stroke="currentColor" stroke-width="2.5"/>
+              <polyline points="10,26 24,16 38,6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 2"/>
+            </svg>
+          </div>
+          <h3>Data Visualisation</h3>
+          <p>Tableau, Power BI, Microsoft Fabric &amp; Foundry — dashboards your team will actually use.</p>
+          <a href="/services#data-viz" class="card-link" aria-label="Learn more about Data Visualisation">
+            Learn more <span aria-hidden="true">&rarr;</span>
+          </a>
+        </article>
+
+        <article class="preview-card" role="listitem">
+          <div class="preview-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" width="36" height="36" fill="none">
+              <path d="M24 4L8 10V24C8 32.84 15.18 41.16 24 44C32.82 41.16 40 32.84 40 24V10L24 4Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+              <polyline points="16,24 21,30 32,18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Cyber Threat Hunting</h3>
+          <p>Security awareness training that turns your biggest risk — your people — into your strongest defence.</p>
+          <a href="/services#cyber" class="card-link" aria-label="Learn more about Cyber Threat Hunting">
+            Learn more <span aria-hidden="true">&rarr;</span>
+          </a>
+        </article>
+
+      </div>
+
+      <div class="services-cta">
+        <a href="/services" class="btn-primary">View All Services</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       BOTTOM CTA STRIP
+  ════════════════════════════════════════ -->
+  <section class="cta-strip" aria-label="Contact call to action">
+    <div class="cta-strip-inner">
+      <p class="cta-strip-text">Ready to simplify your business?</p>
+      <a href="/contact" class="btn-primary btn-large">Let&rsquo;s Talk</a>
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  /* ── Hero ── */
+  .hero {
+    min-height: calc(100vh - 68px);
+    display: flex;
+    align-items: center;
+    background:
+      radial-gradient(ellipse 70% 60% at 70% 50%, rgba(201,168,76,0.05) 0%, transparent 70%),
+      var(--color-charcoal);
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 4rem);
+  }
+
+  .hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  @media (max-width: 860px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+  }
+
+  /* Left col */
+  .hero-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .hero-accent-bar {
+    flex-shrink: 0;
+    width: 3px;
+    align-self: stretch;
+    min-height: 180px;
+    background: linear-gradient(to bottom, var(--color-gold), rgba(201,168,76,0.1));
+    border-radius: 2px;
+  }
+
+  .hero-left-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .hero-label {
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+
+  .hero-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(2.5rem, 5.5vw, 4rem);
+    font-weight: 800;
+    color: var(--color-off-white);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .hero-heading em {
+    font-style: normal;
+    color: var(--color-gold);
+  }
+
+  .hero-body {
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    color: rgba(245,245,240,0.65);
+    line-height: 1.75;
+    max-width: 480px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 0.5rem;
+  }
+
+  /* Right col */
+  .hero-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hero-logo-frame {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 360px;
+    height: 360px;
+  }
+
+  .hero-logo-img {
+    width: 260px;
+    height: auto;
+    position: relative;
+    z-index: 2;
+    mix-blend-mode: lighten;
+  }
+
+  .hero-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .hero-ring--1 { width: 300px; height: 300px; animation: spin-slow 18s linear infinite; }
+  .hero-ring--2 { width: 360px; height: 360px; animation: spin-slow 28s linear infinite reverse; border-style: dashed; }
+
+  @keyframes spin-slow { to { transform: rotate(360deg); } }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-gold);
+    color: var(--color-charcoal);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.8rem 1.75rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: filter 0.15s ease, transform 0.15s ease;
+  }
+
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); text-decoration: none; }
+  .btn-large { font-size: 1rem; padding: 1rem 2.5rem; }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    color: var(--color-off-white);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.8rem 1.75rem;
+    border: 1.5px solid rgba(245,245,240,0.25);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .btn-outline:hover { border-color: var(--color-gold); color: var(--color-gold); text-decoration: none; }
+
+  /* ── Trust bar ── */
+  .trust-bar {
+    background: #1e1e1e;
+    border-top: 1px solid rgba(201,168,76,0.1);
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+    padding: 1.125rem clamp(1.25rem, 5vw, 4rem);
+  }
+
+  .trust-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+  }
+
+  .trust-item {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245,245,240,0.45);
+  }
+
+  .trust-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-gold);
+    opacity: 0.4;
+  }
+
+  @media (max-width: 540px) { .trust-dot { display: none; } }
+
+  /* ── Services preview ── */
+  .services-preview {
+    padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 4rem);
+  }
+
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .section-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.875rem;
+  }
+
+  .label-tag {
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
+  }
+
+  .section-header h2 {
+    font-family: var(--font-heading);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 800;
+    color: var(--color-off-white);
+    letter-spacing: -0.01em;
+  }
+
+  .section-sub {
+    font-size: 1rem;
+    color: var(--color-mid-grey);
+  }
+
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  @media (max-width: 860px) { .preview-grid { grid-template-columns: 1fr; max-width: 480px; } }
+
+  .preview-card {
+    background: #252525;
+    border-radius: 6px;
+    border-left: 3px solid var(--color-gold);
+    padding: 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .preview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  .preview-icon { color: var(--color-gold); line-height: 0; }
+
+  .preview-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: var(--color-off-white);
+  }
+
+  .preview-card p {
+    font-size: 0.9375rem;
+    color: rgba(245,245,240,0.65);
+    line-height: 1.7;
+    flex: 1;
+  }
+
+  .preview-card p em { font-style: normal; color: var(--color-off-white); }
+
+  .card-link {
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-gold);
+    text-decoration: none;
+    margin-top: 0.25rem;
+  }
+
+  .card-link:hover { text-decoration: underline; }
+
+  .services-cta { text-align: center; }
+
+  /* ── CTA strip ── */
+  .cta-strip {
+    background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+    border-top: 1px solid rgba(201,168,76,0.15);
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 4rem);
+  }
+
+  .cta-strip-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .cta-strip-text {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 800;
+    color: var(--color-off-white);
+    letter-spacing: -0.01em;
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const testimonials = [
+  { quote: "The Tableau migration was flawless. What I expected to take three months was done in three weeks, and our team actually understood what had changed. That never happens.", name: "Operations Director", company: "Logistics firm, UK" },
+  { quote: "I have sat through a lot of AI training. This was the first time I left feeling like I could actually use it on Monday morning. No hype, no jargon — just clear, practical instruction.", name: "Head of Marketing", company: "Professional services, Ireland" },
+  { quote: "Our phishing click rate went from a scary 34% to 6% in one month. The session was engaging, not preachy. People actually paid attention.", name: "IT Manager", company: "Financial services firm" },
+  { quote: "What I appreciated most was the honesty. Before we started, I was told exactly what we could and could not achieve in the time we had. No overselling.", name: "CTO", company: "Series A startup, London" },
+  { quote: "The Power BI dashboards replaced four different Excel reports our leadership team had been staring at for years. The time saving alone paid for the engagement.", name: "Head of Data", company: "Healthcare organisation" },
+  { quote: "The teaching style is unlike anything I have experienced. Complex ideas explained simply — and I actually retained them.", name: "Data Analyst", company: "Retail group, UK" },
+];
+---
+
+<Layout title="Testimonials" description="What clients say about AI Empowerment Group. Real feedback from real engagements.">
+
+  <header class="page-hero">
+    <div class="hero-inner">
+      <span class="label-tag">Social Proof</span>
+      <h1>What Clients <em>Actually Say.</em></h1>
+      <p class="hero-sub">From data migrations to security training — here is what the work looks like from the other side.</p>
+    </div>
+  </header>
+
+  <section class="testimonials-section" aria-label="Client testimonials">
+    <div class="grid-inner">
+      {testimonials.map((t, i) => (
+        <blockquote class="t-card" style={i % 3 === 1 ? "margin-top: 2rem;" : ""}>
+          <div class="quote-mark" aria-hidden="true">&ldquo;</div>
+          <p class="quote-text">{t.quote}</p>
+          <footer class="quote-footer">
+            <strong class="quote-name">{t.name}</strong>
+            <span class="quote-company">{t.company}</span>
+          </footer>
+        </blockquote>
+      ))}
+    </div>
+  </section>
+
+  <div class="page-cta">
+    <p>Ready to add your story?</p>
+    <a href="/contact" class="btn-primary">Schedule a Consultation &rarr;</a>
+  </div>
+
+</Layout>
+
+<style>
+  .page-hero { background: linear-gradient(180deg, rgba(201,168,76,0.07) 0%, transparent 60%), var(--color-charcoal); border-bottom: 1px solid rgba(201,168,76,0.12); padding: clamp(4rem,8vw,6.5rem) clamp(1.25rem,5vw,4rem) clamp(3rem,5vw,5rem); }
+  .hero-inner { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+  .label-tag { font-family: var(--font-heading); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-gold); border: 1px solid rgba(201,168,76,0.35); padding: 0.3rem 0.9rem; border-radius: 2px; align-self: flex-start; }
+  .page-hero h1 { font-family: var(--font-heading); font-size: clamp(2.25rem,5vw,3.5rem); font-weight: 800; color: var(--color-off-white); letter-spacing: -0.02em; line-height: 1.1; }
+  .page-hero h1 em { font-style: normal; color: var(--color-gold); }
+  .hero-sub { font-size: 1.0625rem; color: rgba(245,245,240,0.6); line-height: 1.75; }
+
+  .testimonials-section { padding: clamp(3.5rem,6vw,6rem) clamp(1.25rem,5vw,4rem); }
+  .grid-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; align-items: start; }
+  @media (max-width: 860px) { .grid-inner { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 540px) { .grid-inner { grid-template-columns: 1fr; } .t-card { margin-top: 0 !important; } }
+
+  .t-card { background: #222; border-radius: 6px; border-top: 3px solid var(--color-gold); padding: 1.75rem; display: flex; flex-direction: column; gap: 1rem; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .t-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
+
+  .quote-mark { font-family: Georgia, serif; font-size: 3rem; line-height: 1; color: var(--color-gold); opacity: 0.4; margin-bottom: -0.5rem; }
+  .quote-text { font-size: clamp(0.9375rem, 1.1vw, 1rem); color: rgba(245,245,240,0.78); line-height: 1.75; flex: 1; font-style: italic; }
+  .quote-footer { display: flex; flex-direction: column; gap: 0.2rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem; }
+  .quote-name { font-family: var(--font-heading); font-size: 0.875rem; font-weight: 700; color: var(--color-off-white); }
+  .quote-company { font-size: 0.8125rem; color: var(--color-mid-grey); }
+
+  .page-cta { text-align: center; padding: 2rem clamp(1.25rem,5vw,4rem) clamp(4rem,7vw,6rem); display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+  .page-cta p { font-family: var(--font-heading); font-size: clamp(1.25rem,2.5vw,1.75rem); font-weight: 800; color: var(--color-off-white); }
+  .btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--color-gold); color: var(--color-charcoal); font-family: var(--font-heading); font-weight: 700; font-size: 0.875rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.875rem 2rem; border-radius: 4px; text-decoration: none; transition: filter 0.15s, transform 0.15s; }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); text-decoration: none; }
+</style>

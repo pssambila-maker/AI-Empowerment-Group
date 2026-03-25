@@ -1,0 +1,271 @@
+---
+import Layout from "../layouts/Layout.astro";
+import HowIWork from "../components/HowIWork.astro";
+---
+
+<Layout
+  title="Services"
+  description="AI Strategy & Training, Data Visualisation, and Cyber Threat Hunting services from AI Empowerment Group."
+>
+
+  <!-- ── Page hero ── -->
+  <header class="page-hero">
+    <div class="hero-inner">
+      <span class="label-tag">What I Offer</span>
+      <h1>Services Built Around <em>Your</em> Reality</h1>
+      <p class="hero-sub">
+        Whether your team is just starting with AI, buried in disconnected data,
+        or exposed to cyber threats — I meet you where you are and build from there.
+      </p>
+    </div>
+  </header>
+
+  <!-- ── Service offerings ── -->
+  <section class="offerings" aria-labelledby="offerings-heading">
+    <h2 id="offerings-heading" class="sr-only">Service Offerings</h2>
+
+    <div class="offering-grid">
+
+      <!-- Service 1: AI Strategy & Training -->
+      <article class="offering" aria-labelledby="service-ai">
+        <div class="offering-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Brain/neural node network -->
+            <circle cx="24" cy="14" r="5" stroke="currentColor" stroke-width="2.5"/>
+            <circle cx="10" cy="32" r="5" stroke="currentColor" stroke-width="2.5"/>
+            <circle cx="38" cy="32" r="5" stroke="currentColor" stroke-width="2.5"/>
+            <line x1="20" y1="18" x2="13" y2="28" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="28" y1="18" x2="35" y2="28" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="15" y1="32" x2="33" y2="32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="offering-content">
+          <h3 id="service-ai">AI Strategy &amp; Training</h3>
+          <p>
+            Teaching your team to work <em>with</em> AI — not fear it. From prompt engineering
+            workshops to enterprise LLM governance, I help organisations move from confusion
+            to confidence.
+          </p>
+          <ul class="offering-list" aria-label="AI Strategy service details">
+            <li>Hands-on LLM workshop delivery</li>
+            <li>AI tool selection &amp; governance frameworks</li>
+            <li>Prompt engineering for non-technical teams</li>
+            <li>Executive AI readiness briefings</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Divider -->
+      <div class="offering-divider" aria-hidden="true"></div>
+
+      <!-- Service 2: Data Visualisation -->
+      <article class="offering" aria-labelledby="service-data">
+        <div class="offering-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Bar chart with trend line -->
+            <rect x="6" y="28" width="8" height="14" rx="1.5" stroke="currentColor" stroke-width="2.5"/>
+            <rect x="20" y="18" width="8" height="24" rx="1.5" stroke="currentColor" stroke-width="2.5"/>
+            <rect x="34" y="8" width="8" height="34" rx="1.5" stroke="currentColor" stroke-width="2.5"/>
+            <polyline points="10,26 24,16 38,6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 2"/>
+          </svg>
+        </div>
+        <div class="offering-content">
+          <h3 id="service-data">Data Visualisation</h3>
+          <p>
+            Turning scattered data into decisions. I specialise in the Microsoft and Tableau
+            ecosystems — building dashboards your team will actually use.
+          </p>
+          <ul class="offering-list" aria-label="Data Visualisation service details">
+            <li>Tableau Server &amp; Desktop — builds, migrations &amp; training</li>
+            <li>Microsoft Power BI — report design &amp; DAX</li>
+            <li>Microsoft Fabric — data pipeline &amp; lakehouse setup</li>
+            <li>Microsoft Foundry — enterprise data platform configuration</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Divider -->
+      <div class="offering-divider" aria-hidden="true"></div>
+
+      <!-- Service 3: Cyber Threat Hunting -->
+      <article class="offering" aria-labelledby="service-cyber">
+        <div class="offering-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Shield with magnifying glass -->
+            <path d="M24 4L8 10V24C8 32.84 15.18 41.16 24 44C32.82 41.16 40 32.84 40 24V10L24 4Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="22" cy="23" r="6" stroke="currentColor" stroke-width="2"/>
+            <line x1="26.2" y1="27.2" x2="31" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="offering-content">
+          <h3 id="service-cyber">Cyber Threat Hunting</h3>
+          <p>
+            Your biggest security risk is usually a human one. I run awareness programmes
+            that teach your team to recognise and respond to threats — before they become incidents.
+          </p>
+          <ul class="offering-list" aria-label="Cyber Threat Hunting service details">
+            <li>Security awareness training for non-technical staff</li>
+            <li>Phishing simulation &amp; response drills</li>
+            <li>Threat identification workshops</li>
+            <li>Protection framework reviews</li>
+          </ul>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ── How I Work ── -->
+  <HowIWork />
+
+</Layout>
+
+<style>
+  /* ── Utilities ── */
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── Page hero ── */
+  .page-hero {
+    background:
+      linear-gradient(180deg, rgba(201,168,76,0.07) 0%, transparent 60%),
+      var(--color-charcoal);
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    padding: clamp(4rem, 8vw, 6.5rem) clamp(1.25rem, 5vw, 4rem) clamp(3rem, 5vw, 5rem);
+  }
+
+  .hero-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+  }
+
+  .label-tag {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    border: 1px solid rgba(201,168,76,0.35);
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
+    align-self: flex-start;
+  }
+
+  .page-hero h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: var(--color-off-white);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .page-hero h1 em {
+    font-style: normal;
+    color: var(--color-gold);
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    color: rgba(245,245,240,0.65);
+    line-height: 1.75;
+    max-width: 600px;
+  }
+
+  /* ── Service offerings ── */
+  .offerings {
+    padding: clamp(3.5rem, 6vw, 6rem) clamp(1.25rem, 5vw, 4rem);
+  }
+
+  .offering-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .offering {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 1.5rem 2rem;
+    padding: 2.5rem 0;
+    align-items: start;
+  }
+
+  @media (max-width: 540px) {
+    .offering {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .offering-icon {
+    color: var(--color-gold);
+    padding-top: 0.25rem;
+  }
+
+  .offering-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .offering-content h3 {
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    font-weight: 800;
+    color: var(--color-off-white);
+    letter-spacing: -0.01em;
+  }
+
+  .offering-content p {
+    font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
+    color: rgba(245,245,240,0.7);
+    line-height: 1.75;
+    max-width: 600px;
+  }
+
+  .offering-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+  }
+
+  .offering-list li {
+    font-size: 0.9375rem;
+    color: rgba(245,245,240,0.6);
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .offering-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-gold);
+    opacity: 0.7;
+  }
+
+  .offering-divider {
+    height: 1px;
+    background: rgba(201,168,76,0.15);
+    width: 100%;
+  }
+</style>

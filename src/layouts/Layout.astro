@@ -1,0 +1,83 @@
+---
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+
+export interface Props {
+  title: string;
+  description?: string;
+  hideNav?: boolean;
+  hideFooter?: boolean;
+}
+
+const {
+  title,
+  description = "AI Empowerment Group — AI Strategy, Data Visualisation & Cybersecurity Consulting.",
+  hideNav = false,
+  hideFooter = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title} | AI Empowerment Group</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style is:global>
+      :root {
+        --color-charcoal:   #2D2D2D;
+        --color-charcoal-light: #3A3A3A;
+        --color-gold:       #C9A84C;
+        --color-gold-dim:   #a88836;
+        --color-off-white:  #F5F5F0;
+        --color-mid-grey:   #6B6B6B;
+        --color-error:      #CC3333;
+        --color-success:    #2D7D32;
+        --font-heading:     'Montserrat', sans-serif;
+        --font-body:        'Inter', sans-serif;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html { font-size: 16px; scroll-behavior: smooth; }
+
+      body {
+        background-color: var(--color-charcoal);
+        color: var(--color-off-white);
+        font-family: var(--font-body);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      h1, h2, h3, h4 {
+        font-family: var(--font-heading);
+        line-height: 1.2;
+      }
+
+      a {
+        color: var(--color-gold);
+        text-decoration: none;
+      }
+
+      a:hover { text-decoration: underline; }
+
+      :focus-visible {
+        outline: 2px solid var(--color-gold);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    {!hideNav && <Nav />}
+    <slot />
+    {!hideFooter && <Footer />}
+  </body>
+</html>
