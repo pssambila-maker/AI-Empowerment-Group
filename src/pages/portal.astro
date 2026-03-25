@@ -1,0 +1,493 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Client Portal" description="AI Empowerment Group — Client Portal" hideNav={false}>
+
+  <!-- Loading state -->
+  <div id="state-loading" class="full-center">
+    <div class="spinner" aria-label="Loading your portal"></div>
+    <p>Loading your portal…</p>
+  </div>
+
+  <!-- Needs subscription -->
+  <div id="state-subscribe" class="full-center" hidden>
+    <img src="/images/logo/neural-phoenix.png" alt="AI Empowerment Group" height="72" class="portal-logo" />
+    <h1>Your Portal Awaits</h1>
+    <p class="sub-text">
+      Start your weekly training subscription to unlock your private<br />
+      messaging channel with your consultant.
+    </p>
+    <div class="price-badge">$750 <span>/ week</span></div>
+    <button id="subscribe-btn" class="btn-primary">
+      Start Subscription
+    </button>
+    <p class="small-note">Billed weekly via Stripe. Cancel any time.</p>
+  </div>
+
+  <!-- Subscription lapsed -->
+  <div id="state-lapsed" class="full-center" hidden>
+    <img src="/images/logo/neural-phoenix.png" alt="AI Empowerment Group" height="72" class="portal-logo" />
+    <h2 class="lapsed-heading">Subscription Lapsed</h2>
+    <p class="sub-text">Your last payment could not be processed. Reactivate to regain access.</p>
+    <button id="reactivate-btn" class="btn-primary">Reactivate — $750/week</button>
+    <a href="/contact" class="btn-ghost">Contact Support</a>
+  </div>
+
+  <!-- Portal: messaging channel -->
+  <div id="state-portal" class="portal-layout" hidden>
+
+    <!-- Sidebar -->
+    <aside class="portal-sidebar">
+      <div class="sidebar-logo">
+        <img src="/images/logo/neural-phoenix.png" alt="AI Empowerment Group" height="44" class="portal-logo" />
+      </div>
+      <div class="sidebar-user">
+        <div class="avatar" id="user-avatar" aria-hidden="true"></div>
+        <div class="user-info">
+          <span id="user-name" class="user-name">—</span>
+          <span class="user-status">Active subscriber</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav" aria-label="Portal navigation">
+        <a href="#messages" class="sidebar-link active" aria-current="page">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Messages
+        </a>
+        <a href="/contact" class="sidebar-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Support
+        </a>
+      </nav>
+      <button id="signout-btn" class="signout-btn" type="button">Sign Out</button>
+    </aside>
+
+    <!-- Main chat area -->
+    <main class="portal-main" aria-label="Messaging channel">
+      <header class="chat-header">
+        <div class="chat-header-info">
+          <div class="consultant-avatar" aria-hidden="true">AEG</div>
+          <div>
+            <p class="chat-name">AI Empowerment Group</p>
+            <p class="chat-status" id="chat-status">Your private consulting channel</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Messages -->
+      <div class="messages-wrap" id="messages-wrap" role="log" aria-live="polite" aria-label="Message history">
+        <div id="messages-list" class="messages-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Input -->
+      <form class="message-form" id="message-form" aria-label="Send a message">
+        <textarea
+          id="message-input"
+          class="message-input"
+          placeholder="Type your message…"
+          rows="1"
+          maxlength="2000"
+          aria-label="Message input"
+          required
+        ></textarea>
+        <button type="submit" class="send-btn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </form>
+    </main>
+  </div>
+
+</Layout>
+
+<script>
+  import { initializeApp, getApps } from "firebase/app";
+  import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+  import {
+    getFirestore, collection, addDoc, onSnapshot,
+    query, orderBy, serverTimestamp, doc, getDoc,
+  } from "firebase/firestore";
+
+  const firebaseConfig = {
+    apiKey:            import.meta.env.PUBLIC_FIREBASE_API_KEY,
+    authDomain:        import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId:         import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket:     import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId:             import.meta.env.PUBLIC_FIREBASE_APP_ID,
+  };
+
+  const app  = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // ── State helpers ──
+  type State = "loading" | "subscribe" | "lapsed" | "portal";
+
+  function show(state: State) {
+    (["loading","subscribe","lapsed","portal"] as State[]).forEach((s) => {
+      const el = document.getElementById(`state-${s}`) as HTMLElement;
+      if (el) el.hidden = s !== state;
+    });
+  }
+
+  // ── Populate user info ──
+  function setUser(displayName: string | null, email: string | null) {
+    const nameEl   = document.getElementById("user-name")   as HTMLElement;
+    const avatarEl = document.getElementById("user-avatar") as HTMLElement;
+    const firstName = displayName?.split(" ")[0] ?? email?.split("@")[0] ?? "Client";
+    nameEl.textContent  = displayName || email || "Client";
+    avatarEl.textContent = firstName.charAt(0).toUpperCase();
+  }
+
+  // ── Messaging ──
+  let unsubscribeMessages: (() => void) | null = null;
+
+  function renderMessage(text: string, sender: string, ts: any) {
+    const list = document.getElementById("messages-list") as HTMLElement;
+    const isClient = sender === "client";
+    const time = ts?.toDate ? ts.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+
+    const bubble = document.createElement("div");
+    bubble.className = `message ${isClient ? "message--client" : "message--consultant"}`;
+    bubble.innerHTML = `
+      <div class="bubble">${text.replace(/</g,"&lt;").replace(/\n/g,"<br>")}</div>
+      ${time ? `<span class="message-time">${time}</span>` : ""}
+    `;
+    list.appendChild(bubble);
+
+    // Scroll to bottom
+    const wrap = document.getElementById("messages-wrap") as HTMLElement;
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  function startMessaging(uid: string) {
+    const messagesRef = collection(db, "conversations", uid, "messages");
+    const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+    // Clear existing
+    (document.getElementById("messages-list") as HTMLElement).innerHTML = "";
+
+    unsubscribeMessages = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const data = change.doc.data();
+          renderMessage(data.text, data.sender, data.timestamp);
+        }
+      });
+    });
+
+    // Send message
+    const form  = document.getElementById("message-form")  as HTMLFormElement;
+    const input = document.getElementById("message-input") as HTMLTextAreaElement;
+    const btn   = form.querySelector(".send-btn")          as HTMLButtonElement;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = "";
+      input.style.height = "auto";
+      btn.disabled = true;
+
+      try {
+        await addDoc(messagesRef, {
+          text,
+          sender: "client",
+          timestamp: serverTimestamp(),
+          read: false,
+        });
+      } finally {
+        btn.disabled = false;
+        input.focus();
+      }
+    });
+
+    // Auto-resize textarea
+    input.addEventListener("input", () => {
+      input.style.height = "auto";
+      input.style.height = Math.min(input.scrollHeight, 120) + "px";
+    });
+
+    // Send on Enter (Shift+Enter for newline)
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+  }
+
+  // ── Sign out ──
+  document.getElementById("signout-btn")?.addEventListener("click", async () => {
+    unsubscribeMessages?.();
+    await signOut(auth);
+    window.location.href = "/login";
+  });
+
+  // ── Subscription buttons (Stripe — Phase 2) ──
+  async function startCheckout() {
+    // TODO: call Firebase Function createCheckoutSession when Stripe is set up
+    window.location.href = "/contact?inquiry=ai-strategy&note=subscription";
+  }
+
+  document.getElementById("subscribe-btn")?.addEventListener("click",    startCheckout);
+  document.getElementById("reactivate-btn")?.addEventListener("click",   startCheckout);
+
+  // ── Auth gate ──
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "/login?redirect=/portal";
+      return;
+    }
+
+    setUser(user.displayName, user.email);
+
+    // Check Firestore membership status
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+
+    if (!userDoc.exists()) {
+      // New user — no Stripe record yet; show subscribe prompt
+      show("subscribe");
+      return;
+    }
+
+    const status = userDoc.data()?.membershipStatus;
+
+    if (status === "paid") {
+      show("portal");
+      startMessaging(user.uid);
+    } else if (status === "inactive") {
+      show("lapsed");
+    } else {
+      show("subscribe");
+    }
+  });
+</script>
+
+<style>
+  /* ── Full-page centred states ── */
+  .full-center {
+    min-height: calc(100vh - 68px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: 2rem;
+    text-align: center;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%), var(--color-charcoal);
+  }
+
+  .portal-logo { mix-blend-mode: lighten; }
+
+  .full-center h1, .full-center h2 {
+    font-family: var(--font-heading);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    color: var(--color-gold);
+    letter-spacing: -0.01em;
+  }
+
+  .lapsed-heading { color: var(--color-error); }
+
+  .sub-text {
+    font-size: 1rem;
+    color: rgba(245,245,240,0.65);
+    line-height: 1.7;
+    max-width: 420px;
+  }
+
+  .price-badge {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-off-white);
+  }
+  .price-badge span { font-size: 1rem; color: var(--color-mid-grey); font-weight: 500; }
+
+  .btn-primary {
+    background: var(--color-gold); color: var(--color-charcoal);
+    font-family: var(--font-heading); font-weight: 700; font-size: 0.9375rem;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    border: none; border-radius: 4px; padding: 0.9rem 2.25rem; cursor: pointer;
+    transition: filter 0.15s, transform 0.15s;
+  }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+  .btn-ghost { color: var(--color-mid-grey); font-size: 0.875rem; text-decoration: underline; text-underline-offset: 3px; }
+  .btn-ghost:hover { color: var(--color-off-white); }
+
+  .small-note { font-size: 0.8rem; color: var(--color-mid-grey); }
+
+  /* ── Loading ── */
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid rgba(201,168,76,0.2);
+    border-top-color: var(--color-gold);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #state-loading p { font-size: 0.9rem; color: var(--color-mid-grey); }
+
+  /* ── Portal layout ── */
+  .portal-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    height: calc(100vh - 68px);
+    overflow: hidden;
+  }
+
+  @media (max-width: 640px) {
+    .portal-layout { grid-template-columns: 1fr; }
+    .portal-sidebar { display: none; }
+  }
+
+  /* ── Sidebar ── */
+  .portal-sidebar {
+    background: #1a1a1a;
+    border-right: 1px solid rgba(201,168,76,0.12);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1.25rem;
+    gap: 1.5rem;
+  }
+
+  .sidebar-logo img { mix-blend-mode: lighten; }
+
+  .sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    background: rgba(201,168,76,0.06);
+    border-radius: 6px;
+    border: 1px solid rgba(201,168,76,0.12);
+  }
+
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--color-gold); color: var(--color-charcoal);
+    font-family: var(--font-heading); font-weight: 800; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .user-name { display: block; font-size: 0.875rem; font-weight: 600; color: var(--color-off-white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+  .user-status { font-size: 0.75rem; color: var(--color-gold); }
+
+  .sidebar-nav { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; }
+
+  .sidebar-link {
+    display: flex; align-items: center; gap: 0.625rem;
+    padding: 0.625rem 0.875rem; border-radius: 4px;
+    font-size: 0.875rem; color: rgba(245,245,240,0.55);
+    text-decoration: none; transition: background 0.15s, color 0.15s;
+  }
+  .sidebar-link:hover { background: rgba(255,255,255,0.05); color: var(--color-off-white); text-decoration: none; }
+  .sidebar-link.active { background: rgba(201,168,76,0.1); color: var(--color-gold); }
+
+  .signout-btn {
+    background: none; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px; padding: 0.625rem;
+    font-size: 0.8125rem; color: var(--color-mid-grey);
+    cursor: pointer; transition: color 0.15s, border-color 0.15s;
+    margin-top: auto;
+  }
+  .signout-btn:hover { color: var(--color-error); border-color: rgba(204,51,51,0.4); }
+
+  /* ── Chat main ── */
+  .portal-main {
+    display: flex; flex-direction: column;
+    height: 100%; overflow: hidden;
+    background: var(--color-charcoal);
+  }
+
+  .chat-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    background: rgba(0,0,0,0.15);
+    display: flex; align-items: center;
+  }
+
+  .chat-header-info { display: flex; align-items: center; gap: 0.875rem; }
+
+  .consultant-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-gold), #a88836);
+    color: var(--color-charcoal);
+    font-family: var(--font-heading); font-weight: 800; font-size: 0.75rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .chat-name { font-family: var(--font-heading); font-size: 0.9375rem; font-weight: 700; color: var(--color-off-white); }
+  .chat-status { font-size: 0.75rem; color: var(--color-mid-grey); }
+
+  /* Messages */
+  .messages-wrap {
+    flex: 1; overflow-y: auto;
+    padding: 1.5rem;
+    display: flex; flex-direction: column;
+    scroll-behavior: smooth;
+  }
+
+  .messages-list { display: flex; flex-direction: column; gap: 0.875rem; }
+
+  .message { display: flex; flex-direction: column; max-width: 72%; }
+  .message--client { align-self: flex-end; align-items: flex-end; }
+  .message--consultant { align-self: flex-start; align-items: flex-start; }
+
+  .bubble {
+    padding: 0.75rem 1rem; border-radius: 16px;
+    font-size: 0.9375rem; line-height: 1.55;
+    word-break: break-word;
+  }
+
+  .message--client .bubble {
+    background: var(--color-gold); color: var(--color-charcoal);
+    border-bottom-right-radius: 4px;
+  }
+
+  .message--consultant .bubble {
+    background: #2a2a2a; color: var(--color-off-white);
+    border-bottom-left-radius: 4px;
+    border: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .message-time { font-size: 0.6875rem; color: var(--color-mid-grey); padding: 0.2rem 0.25rem; }
+
+  /* Input form */
+  .message-form {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(201,168,76,0.12);
+    background: rgba(0,0,0,0.1);
+    display: flex; gap: 0.75rem; align-items: flex-end;
+  }
+
+  .message-input {
+    flex: 1; background: #1e1e1e;
+    border: 1.5px solid rgba(245,245,240,0.1);
+    border-radius: 12px; color: var(--color-off-white);
+    font-family: var(--font-body); font-size: 0.9375rem;
+    padding: 0.75rem 1rem; resize: none;
+    line-height: 1.5; max-height: 120px;
+    transition: border-color 0.15s;
+  }
+
+  .message-input:focus { outline: none; border-color: var(--color-gold); }
+  .message-input::placeholder { color: rgba(245,245,240,0.25); }
+
+  .send-btn {
+    width: 42px; height: 42px; flex-shrink: 0;
+    background: var(--color-gold); color: var(--color-charcoal);
+    border: none; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: filter 0.15s, transform 0.15s;
+  }
+  .send-btn:hover:not(:disabled) { filter: brightness(1.1); transform: scale(1.05); }
+  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
