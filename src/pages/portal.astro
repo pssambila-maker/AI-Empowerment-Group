@@ -246,22 +246,34 @@ import Layout from "../layouts/Layout.astro";
     setUser(user.displayName, user.email);
 
     // Check Firestore membership status
-    const userDoc = await getDoc(doc(db, "users", user.uid));
+    // Wrapped in try/catch — if Firestore isn't set up yet, default to subscribe state
+    try {
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Firestore timeout")), 5000)
+      );
 
-    if (!userDoc.exists()) {
-      // New user — no Stripe record yet; show subscribe prompt
-      show("subscribe");
-      return;
-    }
+      const userDoc = await Promise.race([
+        getDoc(doc(db, "users", user.uid)),
+        timeoutPromise,
+      ]) as Awaited<ReturnType<typeof getDoc>>;
 
-    const status = userDoc.data()?.membershipStatus;
+      if (!userDoc.exists()) {
+        show("subscribe");
+        return;
+      }
 
-    if (status === "paid") {
-      show("portal");
-      startMessaging(user.uid);
-    } else if (status === "inactive") {
-      show("lapsed");
-    } else {
+      const status = userDoc.data()?.membershipStatus;
+
+      if (status === "paid") {
+        show("portal");
+        startMessaging(user.uid);
+      } else if (status === "inactive") {
+        show("lapsed");
+      } else {
+        show("subscribe");
+      }
+    } catch {
+      // Firestore not reachable yet — show subscribe state
       show("subscribe");
     }
   });
