@@ -245,25 +245,16 @@ import Layout from "../layouts/Layout.astro";
 
     setUser(user.displayName, user.email);
 
-    // Check Firestore membership status
-    // Wrapped in try/catch — if Firestore isn't set up yet, default to subscribe state
+    // NOTE: Stripe membership gate is added in Phase 2.
+    // For now, any authenticated user gets portal access.
+    // When Stripe is live, uncomment the membershipStatus check below.
+    show("portal");
+    startMessaging(user.uid);
+
+    /* Phase 2 — uncomment when Stripe webhooks are active:
     try {
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Firestore timeout")), 5000)
-      );
-
-      const userDoc = await Promise.race([
-        getDoc(doc(db, "users", user.uid)),
-        timeoutPromise,
-      ]) as Awaited<ReturnType<typeof getDoc>>;
-
-      if (!userDoc.exists()) {
-        show("subscribe");
-        return;
-      }
-
-      const status = userDoc.data()?.membershipStatus;
-
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const status = userDoc.exists() ? userDoc.data()?.membershipStatus : null;
       if (status === "paid") {
         show("portal");
         startMessaging(user.uid);
@@ -273,9 +264,10 @@ import Layout from "../layouts/Layout.astro";
         show("subscribe");
       }
     } catch {
-      // Firestore not reachable yet — show subscribe state
-      show("subscribe");
+      show("portal");
+      startMessaging(user.uid);
     }
+    */
   });
 </script>
 
