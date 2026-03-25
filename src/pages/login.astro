@@ -61,30 +61,118 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
-  // Firebase Auth will be wired in Phase 2.
-  // This is the UI scaffold for local testing.
-  const form = document.getElementById("login-form") as HTMLFormElement;
-  const loginBtn = document.getElementById("login-btn") as HTMLButtonElement;
+  import { initializeApp, getApps } from "firebase/app";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider,
+    sendPasswordResetEmail,
+  } from "firebase/auth";
+
+  const firebaseConfig = {
+    apiKey:            import.meta.env.PUBLIC_FIREBASE_API_KEY,
+    authDomain:        import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId:         import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket:     import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId:             import.meta.env.PUBLIC_FIREBASE_APP_ID,
+  };
+
+  const app  = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const form       = document.getElementById("login-form")  as HTMLFormElement;
+  const loginBtn   = document.getElementById("login-btn")   as HTMLButtonElement;
   const loginError = document.getElementById("login-error") as HTMLElement;
 
+  // Determine redirect target — honour ?redirect= param if present
+  const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/portal";
+
+  function showError(message: string) {
+    loginError.textContent = message;
+    loginError.hidden = false;
+  }
+
+  function setLoading(loading: boolean, label = "Sign In") {
+    loginBtn.disabled = loading;
+    loginBtn.textContent = loading ? "Signing in…" : label;
+  }
+
+  // ── Email / Password sign-in ──
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     loginError.hidden = true;
-    loginBtn.textContent = "Signing in…";
-    loginBtn.disabled = true;
-    // TODO: replace with Firebase Auth sign-in
-    await new Promise((r) => setTimeout(r, 1000));
-    loginError.hidden = false;
-    loginBtn.textContent = "Sign In";
-    loginBtn.disabled = false;
+
+    const email    = (document.getElementById("email")    as HTMLInputElement).value.trim();
+    const password = (document.getElementById("password") as HTMLInputElement).value;
+
+    if (!email || !password) {
+      showError("Please enter your email and password.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = redirectTo;
+    } catch (err: any) {
+      const code = err?.code ?? "";
+      if (code === "auth/user-not-found" || code === "auth/wrong-password" || code === "auth/invalid-credential") {
+        showError("Invalid email or password. Please try again.");
+      } else if (code === "auth/too-many-requests") {
+        showError("Too many attempts. Please wait a moment and try again.");
+      } else if (code === "auth/user-disabled") {
+        showError("This account has been disabled. Please contact support.");
+      } else {
+        showError("Something went wrong. Please try again.");
+      }
+      setLoading(false);
+    }
   });
 
-  document.getElementById("forgot-btn")?.addEventListener("click", () => {
-    alert("Password reset — Firebase Auth to be wired in Phase 2.");
+  // ── Google Sign-In ──
+  document.getElementById("google-btn")?.addEventListener("click", async () => {
+    loginError.hidden = true;
+    const googleBtn = document.getElementById("google-btn") as HTMLButtonElement;
+    googleBtn.disabled = true;
+    googleBtn.textContent = "Signing in…";
+
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      window.location.href = redirectTo;
+    } catch (err: any) {
+      const code = err?.code ?? "";
+      if (code !== "auth/popup-closed-by-user" && code !== "auth/cancelled-popup-request") {
+        showError("Google sign-in failed. Please try again.");
+      }
+      googleBtn.disabled = false;
+      googleBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg> Continue with Google`;
+    }
   });
 
-  document.getElementById("google-btn")?.addEventListener("click", () => {
-    alert("Google Sign-In — Firebase Auth to be wired in Phase 2.");
+  // ── Forgot Password ──
+  document.getElementById("forgot-btn")?.addEventListener("click", async () => {
+    const email = (document.getElementById("email") as HTMLInputElement).value.trim();
+
+    if (!email) {
+      showError("Please enter your email address above, then click Forgot password.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      loginError.hidden = true;
+      // Show success inline
+      const successMsg = document.createElement("p");
+      successMsg.textContent = `Reset email sent to ${email}. Check your inbox.`;
+      successMsg.style.cssText = "color:#6fcf7c;font-size:0.875rem;text-align:center;";
+      document.getElementById("forgot-btn")?.parentElement?.insertAdjacentElement("afterend", successMsg);
+    } catch {
+      showError("Could not send reset email. Check the address and try again.");
+    }
   });
 </script>
 
