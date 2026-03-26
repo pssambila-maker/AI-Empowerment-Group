@@ -106,7 +106,7 @@ import Layout from "../layouts/Layout.astro";
   import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
   import {
     getFirestore, collection, addDoc, onSnapshot,
-    query, orderBy, serverTimestamp, doc, getDoc,
+    query, orderBy, serverTimestamp, doc, getDoc, setDoc,
   } from "firebase/firestore";
 
   const firebaseConfig = {
@@ -244,6 +244,19 @@ import Layout from "../layouts/Layout.astro";
     }
 
     setUser(user.displayName, user.email);
+
+    // Create or update user document in Firestore on every login.
+    // merge:true means existing fields (e.g. membershipStatus) are never overwritten.
+    try {
+      await setDoc(doc(db, "users", user.uid), {
+        displayName:  user.displayName || "",
+        email:        user.email || "",
+        photoURL:     user.photoURL || "",
+        lastLoginAt:  serverTimestamp(),
+      }, { merge: true });
+    } catch (err) {
+      console.error("Could not write user document:", err);
+    }
 
     // NOTE: Stripe membership gate is added in Phase 2.
     // For now, any authenticated user gets portal access.
