@@ -1,0 +1,55 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Fields only Cloud Functions (Admin SDK, which bypasses these rules)
+    // may write — clients must never grant themselves membership.
+    function touchesProtectedFields() {
+      return request.resource.data.keys().hasAny([
+        'membershipStatus', 'membershipUpdatedAt',
+        'stripeCustomerId', 'stripeSubscriptionId'
+      ]);
+    }
+
+    function updatesProtectedFields() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'membershipStatus', 'membershipUpdatedAt',
+        'stripeCustomerId', 'stripeSubscriptionId'
+      ]);
+    }
+
+    // User profiles — each user can only see and edit their own
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && !touchesProtectedFields();
+      allow update: if request.auth != null && request.auth.uid == uid
+        && !updatesProtectedFields();
+      allow delete: if false;
+    }
+
+    // Private consulting channel — one conversation per user.
+    // The consultant replies via the Admin SDK, which bypasses rules.
+    match /conversations/{uid}/messages/{messageId} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.sender == 'client'
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 2000;
+      allow update, delete: if false;
+    }
+
+    // Contact enquiries are written by the submitContactForm Cloud Function
+    // (Admin SDK) — no direct client access.
+    match /contactSubmissions/{submissionId} {
+      allow read, write: if false;
+    }
+
+    // Deny everything else by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

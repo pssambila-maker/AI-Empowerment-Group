@@ -170,6 +170,21 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
+  import { initializeApp, getApps } from "firebase/app";
+  import { getFunctions, httpsCallable } from "firebase/functions";
+
+  const firebaseConfig = {
+    apiKey:            import.meta.env.PUBLIC_FIREBASE_API_KEY,
+    authDomain:        import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId:         import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket:     import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId:             import.meta.env.PUBLIC_FIREBASE_APP_ID,
+  };
+
+  const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+  const submitContactForm = httpsCallable(getFunctions(app), "submitContactForm");
+
   const form = document.getElementById("contact-form") as HTMLFormElement;
   const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
   const successBanner = document.getElementById("form-success") as HTMLElement;
@@ -236,15 +251,24 @@ import Layout from "../layouts/Layout.astro";
     submitBtn.textContent = "Sending…";
     submitBtn.disabled = true;
 
-    // TODO: replace with Firebase Function call
-    await new Promise((r) => setTimeout(r, 1200)); // Simulated delay for local testing
-
-    // Simulated success — replace with real submit logic
-    successBanner.hidden = false;
-    form.reset();
-    submitBtn.textContent = "Send Message";
-    submitBtn.disabled = false;
-    successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    try {
+      await submitContactForm({
+        name:    (document.getElementById("name")    as HTMLInputElement).value.trim(),
+        email:   (document.getElementById("email")   as HTMLInputElement).value.trim(),
+        country: (document.getElementById("country") as HTMLSelectElement).value,
+        inquiry: (document.getElementById("inquiry") as HTMLSelectElement).value,
+        message: (document.getElementById("message") as HTMLTextAreaElement).value.trim(),
+      });
+      successBanner.hidden = false;
+      form.reset();
+      successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch {
+      errorBanner.hidden = false;
+      errorBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } finally {
+      submitBtn.textContent = "Send Message";
+      submitBtn.disabled = false;
+    }
   });
 
   // Inline real-time validation on blur

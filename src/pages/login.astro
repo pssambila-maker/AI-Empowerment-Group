@@ -86,8 +86,12 @@ import Layout from "../layouts/Layout.astro";
   const loginBtn   = document.getElementById("login-btn")   as HTMLButtonElement;
   const loginError = document.getElementById("login-error") as HTMLElement;
 
-  // Determine redirect target — honour ?redirect= param if present
-  const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/portal";
+  // Determine redirect target — honour ?redirect= param if present.
+  // Only same-origin paths are allowed (prevents open redirects like
+  // ?redirect=https://evil.com or ?redirect=//evil.com).
+  const rawRedirect = new URLSearchParams(window.location.search).get("redirect") || "";
+  const redirectTo =
+    rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") ? rawRedirect : "/portal";
 
   function showError(message: string) {
     loginError.textContent = message;

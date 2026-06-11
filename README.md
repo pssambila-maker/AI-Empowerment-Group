@@ -1,8 +1,8 @@
 # AI Empowerment Group — Professional Consultancy Website
 
 **Live Domain:** aiempowermentgroup.com
-**Stack:** Astro · Tailwind CSS · Firebase Hosting
-**Status:** Pre-build / Planning Phase
+**Stack:** Astro · Firebase (Hosting, Auth, Firestore, Functions) · Stripe
+**Status:** In development — core site, auth and portal built; Stripe go-live pending
 
 ---
 
@@ -17,7 +17,7 @@ A premium, multi-page consultancy website for an AI Strategy, Data Science, and 
 | Layer | Technology | Reason |
 |---|---|---|
 | Framework | [Astro](https://astro.build) | Static-first, fast, SEO-friendly |
-| Styling | [Tailwind CSS](https://tailwindcss.com) | Utility-first, easy design system tokens |
+| Styling | Scoped CSS + design tokens | CSS variables in `Layout.astro`, per-page `<style>` blocks |
 | Hosting | [Firebase Hosting](https://firebase.google.com/docs/hosting) | Global CDN, preview channels, fast deploys |
 | Auth (Future) | Firebase Authentication | Google/Email login for client portal |
 | Payments | Stripe Checkout + Firebase Functions | Hosted payment page, webhook-driven member upgrade |
@@ -47,8 +47,8 @@ A premium, multi-page consultancy website for an AI Strategy, Data Science, and 
 /case-studies            → Challenge → Approach → Result cards
 /testimonials            → Client & colleague quotes grid
 /contact                 → Accessible tab-navigable inquiry form
-/login                   → Client portal login (Phase 2)
-/payment-success         → Post-purchase confirmation page
+/login                   → Client portal login (email/password + Google)
+/success                 → Post-purchase confirmation page (verifies subscription)
 /payment-cancelled       → User cancelled checkout page
 /portal                  → Protected client portal (paid members only)
 /accessibility           → WCAG 2.1 statement (footer link)
@@ -64,31 +64,37 @@ ai-empowerment-group/
 │   ├── components/       # Reusable UI components
 │   │   ├── Nav.astro
 │   │   ├── Footer.astro
-│   │   ├── HeroSplit.astro
-│   │   ├── ServiceCard.astro
-│   │   ├── CaseStudyCard.astro
-│   │   └── TestimonialGrid.astro
+│   │   ├── HowIWork.astro
+│   │   └── NeuralPhoenixLogo.astro
 │   ├── layouts/
-│   │   └── Layout.astro  # Base layout with nav/footer
-│   ├── pages/
-│   │   ├── index.astro
-│   │   ├── bio.astro
-│   │   ├── services.astro
-│   │   ├── case-studies.astro
-│   │   ├── testimonials.astro
-│   │   ├── contact.astro
-│   │   ├── login.astro
-│   │   └── accessibility.astro
-│   └── styles/
-│       └── global.css
+│   │   └── Layout.astro  # Base layout: nav/footer + global design tokens
+│   └── pages/
+│       ├── index.astro
+│       ├── bio.astro
+│       ├── services.astro
+│       ├── case-studies.astro
+│       ├── testimonials.astro
+│       ├── contact.astro          # Submits via submitContactForm function
+│       ├── login.astro            # Firebase Auth (email + Google)
+│       ├── portal.astro           # Protected client portal + messaging
+│       ├── success.astro          # Post-checkout verification
+│       ├── payment-cancelled.astro
+│       └── accessibility.astro
+├── functions/            # Firebase Cloud Functions (TypeScript)
+│   └── src/
+│       ├── index.ts
+│       ├── firebase.ts             # Shared Admin SDK init
+│       ├── submitContactForm.ts    # Stores contact enquiries in Firestore
+│       ├── verifySubscription.ts   # Called by /success after checkout
+│       ├── createCheckoutSession.ts# Creates Stripe Checkout session
+│       └── stripeWebhook.ts        # Syncs membershipStatus from Stripe
 ├── public/
-│   ├── images/
-│   │   └── logo/         # Neural Phoenix / Secure Spark assets
-│   └── favicon.ico
+│   └── images/
+│       └── logo/         # Neural Phoenix assets
+├── firestore.rules       # Firestore security rules (deployed via CLI)
 ├── firebase.json
 ├── .firebaserc
 ├── astro.config.mjs
-├── tailwind.config.mjs
 └── package.json
 ```
 
@@ -105,17 +111,14 @@ ai-empowerment-group/
 ### Installation
 
 ```bash
-# Clone / initialize the project
-npm create astro@latest ai-empowerment-group
-
-# Navigate into project
-cd ai-empowerment-group
-
-# Install dependencies
+# Install site dependencies
 npm install
 
-# Add Tailwind integration
-npx astro add tailwind
+# Install Cloud Functions dependencies
+npm install --prefix functions
+
+# Configure environment (Firebase web config)
+cp .env.example .env   # then fill in PUBLIC_FIREBASE_* values
 
 # Run dev server
 npm run dev
@@ -127,15 +130,28 @@ npm run dev
 # Login to Firebase
 firebase login
 
-# Initialize hosting in project root
-firebase init hosting
+# Run a preview deploy of the site
+npm run build && firebase hosting:channel:deploy preview
 
-# Run a preview deploy
-firebase hosting:channel:deploy preview
-
-# Deploy to production
-firebase deploy --only hosting
+# Deploy site + Firestore rules + functions
+npm run build && firebase deploy --only hosting,firestore:rules,functions
 ```
+
+### Stripe Setup (go-live checklist)
+
+1. Create the **AI Empowerment Training** product in the Stripe Dashboard
+   with a recurring **weekly** price of $750, and copy its Price ID into
+   `functions/.env` (see `functions/.env.example`).
+2. Set the secrets:
+   `firebase functions:secrets:set STRIPE_SECRET_KEY` and
+   `firebase functions:secrets:set STRIPE_WEBHOOK_SECRET`.
+3. Add a webhook endpoint in Stripe (Developers → Webhooks) pointing at the
+   deployed `stripeWebhook` function URL, subscribed to:
+   `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`,
+   `customer.subscription.deleted`.
+4. Re-enable the membership gate in `src/pages/portal.astro` (the
+   `membershipStatus` check is currently bypassed so all authenticated
+   users get portal access until Stripe is live).
 
 ---
 
@@ -155,14 +171,14 @@ This site targets **WCAG 2.1 Level AA** compliance:
 
 | Phase | Milestone | Status |
 |---|---|---|
-| 0 | Documentation (README, Flow, Context, Guide) | In Progress |
-| 1 | Project scaffold + design system | Pending |
-| 2 | Core 7 pages built | Pending |
-| 3 | Accessibility audit + QA | Pending |
-| 4 | Firebase deploy + preview channel | Pending |
-| 5 | Client login portal (Firebase Auth) | Future |
-| 6 | Stripe Checkout + webhook integration | Future |
-| 7 | Paid member portal (/portal protected route) | Future |
+| 0 | Documentation (README, Flow, Context, Guide) | Done |
+| 1 | Project scaffold + design system | Done |
+| 2 | Core 7 pages built | Done |
+| 3 | Accessibility audit + QA | In Progress |
+| 4 | Firebase deploy + preview channel | Done |
+| 5 | Client login portal (Firebase Auth) | Done |
+| 6 | Stripe Checkout + webhook integration | Built — needs Stripe Dashboard config + deploy |
+| 7 | Paid member portal (/portal protected route) | Pending Stripe go-live (gate currently bypassed) |
 
 ---
 

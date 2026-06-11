@@ -1,12 +1,5 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
-
-// Initialise Admin SDK once (shared across functions)
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-
-const db = admin.firestore();
+import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { admin, db } from "./firebase";
 
 interface VerifySubscriptionResponse {
   status: "active" | "inactive" | "pending" | "not_found";
@@ -26,18 +19,18 @@ interface VerifySubscriptionResponse {
  * The /success page retries up to 5 times (3s apart) if status is not yet
  * "active", to account for Stripe webhook processing delay.
  */
-export const verifySubscription = functions.https.onCall(
-  async (data, context): Promise<VerifySubscriptionResponse> => {
+export const verifySubscription = onCall(
+  async (request): Promise<VerifySubscriptionResponse> => {
 
     // ── Auth guard ──
-    if (!context.auth) {
-      throw new functions.https.HttpsError(
+    if (!request.auth) {
+      throw new HttpsError(
         "unauthenticated",
         "You must be logged in to verify your subscription."
       );
     }
 
-    const uid = context.auth.uid;
+    const uid = request.auth.uid;
 
     // ── Fetch user profile from Firestore ──
     const userDoc = await db.collection("users").doc(uid).get();
