@@ -1,7 +1,7 @@
 # AI Empowerment Group — Project Context
 
-**Last Updated:** 2026-03-25
-**Project Phase:** Pre-build / Documentation
+**Last Updated:** 2026-06-11
+**Project Phase:** Live — core site + lead-gen assessment funnel deployed
 
 ---
 
@@ -196,3 +196,54 @@ Key requirements:
 | Testimonials | Awaiting quotes from owner |
 | Logo assets | Awaiting file delivery |
 | Contact form fields | Defined: Name, Email, Country, Inquiry Type, Message |
+
+---
+
+## 9. AI Readiness Scorecard Assessment (Live)
+
+**Route:** `/assessment` — linked from main nav ("Free Assessment") and homepage hero CTA.
+
+**Purpose:** Free 15-question lead-generation assessment for both individuals and
+enterprises. Produces a 0–100 "AI Readiness" score, three tailored insights, and
+an invite to a recurring free live class — capturing the visitor as a `leads`
+record in Firestore along the way.
+
+### Funnel steps
+1. **Gateway** — visitor selects Individual or Enterprise path
+2. **Email gate** — Firebase email-link (passwordless) sign-in; visitor receives
+   a sign-in link by email and clicks it to continue
+3. **Profile** — full name + optional phone (email pre-filled from sign-in)
+4. **Questions** — 10-item foundation checklist (4 pts each) + 5 single-choice
+   scored questions (0/3/5/7/10 pts each), 100 pts max
+5. **Results** — animated score gauge, status band (Needs Attention / On Track /
+   High Performer), 3 tailored insights, and free-class signup with
+   Google Calendar / .ics download
+
+### Recurring free class
+- **When:** Every Saturday, 9:00–11:00 AM Eastern Time (DST-aware)
+- **Where:** Zoom — join link configured in `src/config/assessment.ts`
+- On registration, an invite email (subject, date/time, join link, calendar
+  links) is queued via the Firestore `mail` collection and sent by the
+  **Trigger Email** extension (Gmail SMTP)
+
+### Architecture (modular — see `function.docx` for full detail)
+- `src/config/assessment.ts` — single source of truth for questions, scoring
+  weights, score-band insights, and the class schedule
+- `src/lib/assessment/` — pure logic modules: `scoring.ts`, `calendar.ts`,
+  `emailTemplates.ts`, `leads.ts`, `mail.ts`, `auth.ts`, `controller.ts`
+- `src/components/assessment/` — one Astro component per funnel step
+- `src/pages/assessment.astro` — assembles Layout + components + controller
+- `src/lib/firebase/client.ts` — shared Firebase app/auth/Firestore init
+- `firestore.rules` — `leads` and `mail` collections are create-only,
+  restricted to the signed-in user
+
+### Outstanding / owner-managed items
+- Firebase Console: Email Link sign-in must remain enabled (Authentication →
+  Sign-in method → Email/Password → Email link toggle)
+- Trigger Email extension installed, watching `mail` collection, Gmail SMTP
+  configured with an App Password
+- Zoom join link is set to `https://zoom.us/s/9832093373#success` — update in
+  `src/config/assessment.ts` if the recurring meeting link changes
+- Known open issue: "Send Sign-In Link" currently returns a generic error on
+  some environments — root cause not yet confirmed (likely an Auth
+  configuration item: Email Link toggle or Authorized domains)
