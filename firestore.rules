@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Assessment results — created once by the signed-in user who completed
+    // the assessment. No client read/update/delete.
+    match /leads/{leadId} {
+      allow create: if request.auth != null
+                     && request.resource.data.uid == request.auth.uid
+                     && request.resource.data.email is string
+                     && request.resource.data.score is number;
+      allow read, update, delete: if false;
+    }
+
+    // Outgoing emails for the "Trigger Email" extension. Only the signed-in
+    // user can queue an email addressed to their own account; the extension
+    // (running with admin privileges) handles delivery and status updates.
+    match /mail/{mailId} {
+      allow create: if request.auth != null
+                     && request.resource.data.to is list
+                     && request.resource.data.to[0] == request.auth.token.email;
+      allow read, update, delete: if false;
+    }
+
+    // Everything else stays locked down by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

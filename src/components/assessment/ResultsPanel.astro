@@ -1,0 +1,324 @@
+---
+// Step 4 — score gauge, insights, and free-class signup.
+---
+
+<section id="assessment-results" class="results" hidden>
+
+  <div class="results-header">
+    <span class="badge badge--success">Assessment Complete</span>
+    <h2>Your Results Are In</h2>
+    <p class="muted">Here&rsquo;s your personalised performance snapshot</p>
+  </div>
+
+  <div class="card gauge-card">
+    <div class="gauge-wrap">
+      <svg viewBox="0 0 200 110" class="gauge-svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="gauge-arc-red" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#CC3333" />
+            <stop offset="100%" stop-color="#E0673A" />
+          </linearGradient>
+          <linearGradient id="gauge-arc-amber" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#D4AC0D" />
+            <stop offset="100%" stop-color="#C9A84C" />
+          </linearGradient>
+          <linearGradient id="gauge-arc-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#C9A84C" />
+            <stop offset="100%" stop-color="#a88836" />
+          </linearGradient>
+        </defs>
+
+        <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="rgba(245,245,240,0.1)" stroke-width="12" stroke-linecap="round" />
+        <path d="M 20,100 A 80,80 0 0,1 72,40" fill="none" stroke="url(#gauge-arc-red)" stroke-width="12" stroke-linecap="round" />
+        <path d="M 72,40 A 80,80 0 0,1 128,40" fill="none" stroke="url(#gauge-arc-amber)" stroke-width="12" stroke-linecap="round" />
+        <path d="M 128,40 A 80,80 0 0,1 180,100" fill="none" stroke="url(#gauge-arc-gold)" stroke-width="12" stroke-linecap="round" />
+
+        <line id="results-needle" x1="100" y1="100" x2="100" y2="30" stroke="#F5F5F0" stroke-width="4" stroke-linecap="round" class="gauge-needle" style="transform: rotate(-90deg);" />
+        <circle cx="100" cy="100" r="8" fill="#F5F5F0" />
+        <circle cx="100" cy="100" r="3" fill="#2D2D2D" />
+      </svg>
+
+      <div class="gauge-readout">
+        <span class="gauge-readout-label">Your Score</span>
+        <span id="results-score-display" class="gauge-readout-score">0<small>/100</small></span>
+      </div>
+    </div>
+
+    <div id="score-status-pill" class="status-pill">Needs Attention</div>
+
+    <div class="legend">
+      <span><i class="dot dot--red"></i>0&ndash;39 &bull; Needs Attention</span>
+      <span><i class="dot dot--amber"></i>40&ndash;69 &bull; On Track</span>
+      <span><i class="dot dot--gold"></i>70&ndash;100 &bull; High Performer</span>
+    </div>
+  </div>
+
+  <div class="card insights-card">
+    <h4>Your 3 Key Insights</h4>
+    <p class="muted small">Tailored to your score and profile</p>
+    <ol class="insights-list">
+      <li><span class="num">1</span><p id="insight-1"></p></li>
+      <li><span class="num">2</span><p id="insight-2"></p></li>
+      <li><span class="num">3</span><p id="insight-3"></p></li>
+    </ol>
+  </div>
+
+  <div class="card class-card">
+    <h4>Your Recommended Next Step</h4>
+
+    <div id="class-unregistered" class="class-block">
+      <span class="badge">Free AI Class &mdash; Limited Seats</span>
+      <h5>Register for Your Free AI Class</h5>
+      <p class="muted">
+        The class starts from the fundamentals &mdash; no experience needed. Learn practical AI skills
+        live with our instructors &mdash; 100% free, no credit card required.
+      </p>
+      <p class="schedule-line" id="class-schedule-display"></p>
+      <button type="button" id="register-class-btn" class="primary-btn">Register Free &rarr;</button>
+      <p id="register-status" class="muted small" aria-live="polite"></p>
+    </div>
+
+    <div id="class-registered" class="class-block" hidden>
+      <p class="confirm-line">
+        You&rsquo;re registered! A confirmation email with the class schedule and Zoom link is on its way to your inbox.
+      </p>
+      <p class="schedule-line" id="registered-schedule-display"></p>
+      <div class="calendar-actions">
+        <a id="add-google-calendar-link" href="#" target="_blank" rel="noopener" class="secondary-btn">Add to Google Calendar</a>
+        <button type="button" id="download-ics-btn" class="secondary-btn">Download .ics (Outlook/Apple)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-actions">
+    <button type="button" id="restart-btn" class="text-btn">&#x21bb; Retake Assessment</button>
+  </div>
+
+</section>
+
+<style>
+  .results { max-width: 36rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .results-header { text-align: center; }
+
+  .results-header h2 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-off-white);
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  .muted { color: rgba(245,245,240,0.6); }
+  .small { font-size: 0.8125rem; }
+
+  .badge {
+    display: inline-flex;
+    font-family: var(--font-heading);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+  }
+
+  .badge--success { color: var(--color-success); border-color: rgba(45,125,50,0.4); }
+
+  .card {
+    background: #1e1e1e;
+    border: 1px solid rgba(245,245,240,0.08);
+    border-radius: 8px;
+    padding: clamp(1.5rem, 4vw, 2rem);
+  }
+
+  /* Gauge */
+  .gauge-card { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+
+  .gauge-wrap { position: relative; width: 16rem; max-width: 100%; aspect-ratio: 200 / 110; }
+
+  .gauge-svg { width: 100%; height: 100%; }
+
+  .gauge-needle { transform-origin: 100px 100px; transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1); }
+
+  .gauge-readout {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 0.5rem;
+  }
+
+  .gauge-readout-label {
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245,245,240,0.5);
+  }
+
+  .gauge-readout-score {
+    font-family: var(--font-heading);
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--color-off-white);
+    line-height: 1;
+  }
+
+  .gauge-readout-score small { font-size: 1rem; font-weight: 500; color: rgba(245,245,240,0.5); }
+
+  .status-pill {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+  }
+
+  .status-pill.needs-attention { background: rgba(204,51,51,0.15); color: #f08080; border: 1px solid rgba(204,51,51,0.4); }
+  .status-pill.on-track { background: rgba(212,172,13,0.15); color: #e6c34d; border: 1px solid rgba(212,172,13,0.4); }
+  .status-pill.high-performer { background: rgba(45,125,50,0.15); color: #6fcf7c; border: 1px solid rgba(45,125,50,0.4); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(245,245,240,0.08);
+    width: 100%;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(245,245,240,0.6);
+  }
+
+  .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+  .dot { width: 0.625rem; height: 0.625rem; border-radius: 999px; display: inline-block; }
+  .dot--red { background: #CC3333; }
+  .dot--amber { background: #D4AC0D; }
+  .dot--gold { background: var(--color-gold); }
+
+  /* Insights */
+  .insights-card h4 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-off-white);
+  }
+
+  .insights-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; list-style: none; }
+
+  .insights-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 1rem;
+    background: var(--color-charcoal);
+    border: 1px solid rgba(245,245,240,0.08);
+    border-radius: 4px;
+  }
+
+  .insights-list .num {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background: var(--color-gold);
+    color: var(--color-charcoal);
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .insights-list p { font-size: 0.9375rem; line-height: 1.6; color: var(--color-off-white); }
+
+  /* Class card */
+  .class-card h4 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-off-white);
+    margin-bottom: 1rem;
+  }
+
+  .class-block { display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+
+  .class-block h5 {
+    font-family: var(--font-heading);
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: var(--color-off-white);
+  }
+
+  .schedule-line {
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 4px;
+    padding: 0.6rem 1rem;
+  }
+
+  .confirm-line { font-size: 0.9375rem; color: var(--color-off-white); }
+
+  .calendar-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.25rem; }
+
+  .primary-btn, .secondary-btn {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    border-radius: 4px;
+    padding: 0.85rem 1.5rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: filter 0.15s ease, transform 0.15s ease;
+  }
+
+  .primary-btn {
+    background: var(--color-gold);
+    color: var(--color-charcoal);
+    text-transform: uppercase;
+    border: none;
+  }
+
+  .primary-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+  .primary-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .secondary-btn {
+    background: transparent;
+    color: var(--color-off-white);
+    border: 1.5px solid rgba(245,245,240,0.15);
+  }
+
+  .secondary-btn:hover { border-color: var(--color-gold); color: var(--color-gold); }
+
+  .results-actions { text-align: center; }
+
+  .text-btn {
+    background: none;
+    border: none;
+    color: rgba(245,245,240,0.6);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    cursor: pointer;
+  }
+
+  .text-btn:hover { color: var(--color-gold); }
+</style>

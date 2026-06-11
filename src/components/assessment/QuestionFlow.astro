@@ -1,0 +1,251 @@
+---
+// Step 3 — 10-item foundation checklist, then 5 scored single-choice questions.
+---
+
+<section id="assessment-questions" class="questions" hidden>
+
+  <div class="progress">
+    <div class="progress-labels">
+      <span id="q-progress-label" class="progress-label">Questions 1-10 of 15</span>
+      <span id="q-progress-percent" class="progress-percent">0%</span>
+    </div>
+    <div class="progress-track">
+      <div id="q-progress-bar" class="progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Step A: Foundation checklist -->
+  <div id="q-checklist-step" class="q-step">
+    <div class="q-step-meta">
+      <span class="step-tag">Foundation Check</span>
+      <span class="muted small">Select all that apply</span>
+    </div>
+    <h3>Which of the following apply to you?</h3>
+
+    <div id="checklist-wrapper" class="checklist-wrapper"></div>
+
+    <button type="button" id="checklist-next-btn" class="primary-btn">Next Step &rarr;</button>
+  </div>
+
+  <!-- Step B: Scored single-choice questions -->
+  <div id="q-choice-step" class="q-step" hidden>
+    <div class="q-step-meta">
+      <span id="choice-badge" class="step-tag">Question 11</span>
+      <span class="muted small">Choose one</span>
+    </div>
+    <h3 id="choice-title"></h3>
+
+    <div id="choice-options-wrapper" class="choice-options"></div>
+
+    <div class="choice-controls">
+      <button type="button" id="choice-back-btn" class="text-btn">&larr; Back</button>
+      <div id="choice-dots" class="choice-dots">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <button type="button" id="choice-next-btn" class="primary-btn primary-btn--small">Next Step &rarr;</button>
+    </div>
+  </div>
+
+</section>
+
+<style>
+  .questions {
+    max-width: 36rem;
+    margin: 0 auto;
+    background: #1e1e1e;
+    border: 1px solid rgba(245,245,240,0.08);
+    border-radius: 8px;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .progress { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .progress-label { color: var(--color-gold); }
+  .progress-percent { color: var(--color-off-white); }
+
+  .progress-track {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(245,245,240,0.08);
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--color-gold);
+    transition: width 0.3s ease;
+  }
+
+  .q-step { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .q-step-meta { display: flex; align-items: center; gap: 0.75rem; }
+
+  .step-tag {
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+  }
+
+  .muted { color: rgba(245,245,240,0.55); }
+  .small { font-size: 0.8125rem; }
+
+  .q-step h3 {
+    font-family: var(--font-heading);
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: var(--color-off-white);
+    line-height: 1.35;
+  }
+
+  /* Checklist */
+  .checklist-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    max-height: 24rem;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+    background: var(--color-charcoal);
+    border: 1px solid rgba(245,245,240,0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+
+  .checklist-item:hover { border-color: var(--color-gold); }
+
+  .checklist-item input {
+    margin-top: 0.2rem;
+    accent-color: var(--color-gold);
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .checklist-item span {
+    font-size: 0.9375rem;
+    color: var(--color-off-white);
+    line-height: 1.5;
+  }
+
+  /* Choice options */
+  .choice-options { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .choice-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    background: var(--color-charcoal);
+    border: 1px solid rgba(245,245,240,0.1);
+    border-radius: 4px;
+    color: var(--color-off-white);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .choice-option:hover { border-color: var(--color-gold); }
+
+  .choice-option.selected {
+    border-color: var(--color-gold);
+    background: rgba(201,168,76,0.08);
+  }
+
+  .choice-option .pts {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(245,245,240,0.5);
+    background: rgba(245,245,240,0.06);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    flex-shrink: 0;
+  }
+
+  /* Controls */
+  .choice-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(245,245,240,0.08);
+  }
+
+  .choice-dots { display: flex; gap: 0.375rem; }
+
+  .choice-dots span {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: rgba(245,245,240,0.15);
+    transition: background 0.2s ease, width 0.2s ease;
+  }
+
+  .choice-dots span.active { background: var(--color-gold); width: 1.25rem; border-radius: 999px; }
+  .choice-dots span.done { background: var(--color-gold); }
+
+  .text-btn {
+    background: none;
+    border: none;
+    color: rgba(245,245,240,0.6);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    cursor: pointer;
+  }
+
+  .text-btn:hover { color: var(--color-gold); }
+
+  .primary-btn {
+    background: var(--color-gold);
+    color: var(--color-charcoal);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 4px;
+    padding: 0.9rem 1.5rem;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.15s ease;
+  }
+
+  .primary-btn--small { padding: 0.7rem 1.25rem; font-size: 0.8125rem; }
+
+  .primary-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+</style>

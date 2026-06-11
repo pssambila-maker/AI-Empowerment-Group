@@ -1,0 +1,84 @@
+---
+import Layout from "../layouts/Layout.astro";
+import AssessmentGateway from "../components/assessment/AssessmentGateway.astro";
+import EmailGate from "../components/assessment/EmailGate.astro";
+import ProfileForm from "../components/assessment/ProfileForm.astro";
+import QuestionFlow from "../components/assessment/QuestionFlow.astro";
+import ResultsPanel from "../components/assessment/ResultsPanel.astro";
+---
+
+<Layout
+  title="AI Readiness Scorecard"
+  description="Take the free AI Readiness Scorecard assessment and get a personalised score, key insights, and an invite to our free live AI class."
+>
+
+  <div class="page-wrap">
+    <header class="page-header">
+      <span class="label-tag">Free Assessment</span>
+      <h1>AI Readiness Scorecard</h1>
+      <p class="page-subtitle">
+        Answer 15 quick questions to get your personalised AI readiness score, tailored insights,
+        and an invite to our free live AI class.
+      </p>
+    </header>
+
+    <AssessmentGateway />
+    <EmailGate />
+    <ProfileForm />
+    <QuestionFlow />
+    <ResultsPanel />
+  </div>
+
+</Layout>
+
+<script>
+  import { initAssessment } from "../lib/assessment/controller";
+  initAssessment();
+</script>
+
+<style>
+  .page-wrap {
+    padding: clamp(3.5rem, 7vw, 6rem) clamp(1.25rem, 5vw, 4rem);
+    min-height: calc(100vh - 68px);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .page-header {
+    max-width: 36rem;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .label-tag {
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    color: var(--color-off-white);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .page-subtitle {
+    font-size: 1rem;
+    color: rgba(245,245,240,0.65);
+    line-height: 1.75;
+  }
+</style>
