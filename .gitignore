@@ -5,10 +5,10 @@ node_modules/
 dist/
 .astro/
 
-# Environment — NEVER commit
+# Environment — NEVER commit (covers .env, .env.local, .env.production, etc.)
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
 
 # Firebase
 .firebase/
