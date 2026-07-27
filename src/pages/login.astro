@@ -61,26 +61,15 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
-  import { initializeApp, getApps } from "firebase/app";
   import {
-    getAuth,
     signInWithEmailAndPassword,
     signInWithPopup,
     GoogleAuthProvider,
     sendPasswordResetEmail,
   } from "firebase/auth";
+  import { getFirebaseAuth } from "../lib/firebase/client";
 
-  const firebaseConfig = {
-    apiKey:            import.meta.env.PUBLIC_FIREBASE_API_KEY,
-    authDomain:        import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId:         import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket:     import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId:             import.meta.env.PUBLIC_FIREBASE_APP_ID,
-  };
-
-  const app  = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  const auth = getFirebaseAuth();
 
   const form       = document.getElementById("login-form")  as HTMLFormElement;
   const loginBtn   = document.getElementById("login-btn")   as HTMLButtonElement;

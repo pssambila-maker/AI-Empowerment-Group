@@ -1,6 +1,7 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
+import { getFunctions, type Functions } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey:            import.meta.env.PUBLIC_FIREBASE_API_KEY,
@@ -21,4 +22,8 @@ export function getFirebaseAuth(): Auth {
 
 export function getFirebaseDb(): Firestore {
   return getFirestore(getFirebaseApp());
+}
+
+export function getFirebaseFunctions(): Functions {
+  return getFunctions(getFirebaseApp());
 }

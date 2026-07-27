@@ -170,12 +170,27 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
+  import { getFirebaseDb } from "../lib/firebase/client";
+  import { submitContactForm } from "../lib/contact/submit";
+
+  const db = getFirebaseDb();
+
   const form = document.getElementById("contact-form") as HTMLFormElement;
   const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
   const successBanner = document.getElementById("form-success") as HTMLElement;
   const errorBanner = document.getElementById("form-error") as HTMLElement;
 
   type FieldId = "name" | "email" | "country" | "inquiry" | "message";
+
+  function readFormValues() {
+    return {
+      name: (document.getElementById("name") as HTMLInputElement).value.trim(),
+      email: (document.getElementById("email") as HTMLInputElement).value.trim(),
+      country: (document.getElementById("country") as HTMLSelectElement).value,
+      inquiry: (document.getElementById("inquiry") as HTMLSelectElement).value,
+      message: (document.getElementById("message") as HTMLTextAreaElement).value.trim(),
+    };
+  }
 
   function setError(id: FieldId, message: string) {
     const field = document.getElementById(id) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
@@ -195,11 +210,7 @@ import Layout from "../layouts/Layout.astro";
 
   function validate(): boolean {
     let valid = true;
-    const name = (document.getElementById("name") as HTMLInputElement).value.trim();
-    const email = (document.getElementById("email") as HTMLInputElement).value.trim();
-    const country = (document.getElementById("country") as HTMLSelectElement).value;
-    const inquiry = (document.getElementById("inquiry") as HTMLSelectElement).value;
-    const message = (document.getElementById("message") as HTMLTextAreaElement).value.trim();
+    const { name, email, country, inquiry, message } = readFormValues();
 
     if (!name) { setError("name", "Please enter your full name."); valid = false; }
     else clearError("name");
@@ -236,15 +247,18 @@ import Layout from "../layouts/Layout.astro";
     submitBtn.textContent = "Sending…";
     submitBtn.disabled = true;
 
-    // TODO: replace with Firebase Function call
-    await new Promise((r) => setTimeout(r, 1200)); // Simulated delay for local testing
-
-    // Simulated success — replace with real submit logic
-    successBanner.hidden = false;
-    form.reset();
-    submitBtn.textContent = "Send Message";
-    submitBtn.disabled = false;
-    successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    try {
+      await submitContactForm(db, readFormValues());
+      successBanner.hidden = false;
+      form.reset();
+      successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch {
+      errorBanner.hidden = false;
+      errorBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } finally {
+      submitBtn.textContent = "Send Message";
+      submitBtn.disabled = false;
+    }
   });
 
   // Inline real-time validation on blur

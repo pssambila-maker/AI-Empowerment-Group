@@ -102,25 +102,14 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
-  import { initializeApp, getApps } from "firebase/app";
-  import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-  import {
-    getFirestore, collection, addDoc, onSnapshot,
-    query, orderBy, serverTimestamp, doc, getDoc, setDoc,
-  } from "firebase/firestore";
+  import { onAuthStateChanged, signOut } from "firebase/auth";
+  import { getFirebaseAuth, getFirebaseDb } from "../lib/firebase/client";
+  import { upsertUserProfile } from "../lib/portal/profile";
+  import { getMembershipStatus } from "../lib/portal/membership";
+  import { subscribeToMessages, sendMessage, type PortalMessage } from "../lib/portal/messaging";
 
-  const firebaseConfig = {
-    apiKey:            import.meta.env.PUBLIC_FIREBASE_API_KEY,
-    authDomain:        import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId:         import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket:     import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId:             import.meta.env.PUBLIC_FIREBASE_APP_ID,
-  };
-
-  const app  = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
+  const auth = getFirebaseAuth();
+  const db   = getFirebaseDb();
 
   // ── State helpers ──
   type State = "loading" | "subscribe" | "lapsed" | "portal";
@@ -144,10 +133,10 @@ import Layout from "../layouts/Layout.astro";
   // ── Messaging ──
   let unsubscribeMessages: (() => void) | null = null;
 
-  function renderMessage(text: string, sender: string, ts: any) {
+  function renderMessage({ text, sender, timestamp }: PortalMessage) {
     const list = document.getElementById("messages-list") as HTMLElement;
     const isClient = sender === "client";
-    const time = ts?.toDate ? ts.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+    const time = timestamp?.toDate ? timestamp.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
 
     const bubble = document.createElement("div");
     bubble.className = `message ${isClient ? "message--client" : "message--consultant"}`;
@@ -163,20 +152,10 @@ import Layout from "../layouts/Layout.astro";
   }
 
   function startMessaging(uid: string) {
-    const messagesRef = collection(db, "conversations", uid, "messages");
-    const q = query(messagesRef, orderBy("timestamp", "asc"));
-
     // Clear existing
     (document.getElementById("messages-list") as HTMLElement).innerHTML = "";
 
-    unsubscribeMessages = onSnapshot(q, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          const data = change.doc.data();
-          renderMessage(data.text, data.sender, data.timestamp);
-        }
-      });
-    });
+    unsubscribeMessages = subscribeToMessages(db, uid, renderMessage);
 
     // Send message
     const form  = document.getElementById("message-form")  as HTMLFormElement;
@@ -193,12 +172,7 @@ import Layout from "../layouts/Layout.astro";
       btn.disabled = true;
 
       try {
-        await addDoc(messagesRef, {
-          text,
-          sender: "client",
-          timestamp: serverTimestamp(),
-          read: false,
-        });
+        await sendMessage(db, uid, text);
       } finally {
         btn.disabled = false;
         input.focus();
@@ -245,42 +219,25 @@ import Layout from "../layouts/Layout.astro";
 
     setUser(user.displayName, user.email);
 
-    // Create or update user document in Firestore on every login.
-    // merge:true means existing fields (e.g. membershipStatus) are never overwritten.
     try {
-      await setDoc(doc(db, "users", user.uid), {
-        displayName:  user.displayName || "",
-        email:        user.email || "",
-        photoURL:     user.photoURL || "",
-        lastLoginAt:  serverTimestamp(),
-      }, { merge: true });
+      await upsertUserProfile(db, user);
     } catch (err) {
       console.error("Could not write user document:", err);
     }
 
-    // NOTE: Stripe membership gate is added in Phase 2.
-    // For now, any authenticated user gets portal access.
-    // When Stripe is live, uncomment the membershipStatus check below.
-    show("portal");
-    startMessaging(user.uid);
+    // membershipStatus is only ever set by the Stripe webhook function —
+    // see STRIPE_INTEGRATION.md. Until that function is deployed, every
+    // user will read as "none" and see the subscribe screen below.
+    const status = await getMembershipStatus(db, user.uid);
 
-    /* Phase 2 — uncomment when Stripe webhooks are active:
-    try {
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      const status = userDoc.exists() ? userDoc.data()?.membershipStatus : null;
-      if (status === "paid") {
-        show("portal");
-        startMessaging(user.uid);
-      } else if (status === "inactive") {
-        show("lapsed");
-      } else {
-        show("subscribe");
-      }
-    } catch {
+    if (status === "paid") {
       show("portal");
       startMessaging(user.uid);
+    } else if (status === "inactive") {
+      show("lapsed");
+    } else {
+      show("subscribe");
     }
-    */
   });
 </script>
 
