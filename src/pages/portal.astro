@@ -103,13 +103,15 @@ import Layout from "../layouts/Layout.astro";
 
 <script>
   import { onAuthStateChanged, signOut } from "firebase/auth";
-  import { getFirebaseAuth, getFirebaseDb } from "../lib/firebase/client";
+  import { httpsCallable } from "firebase/functions";
+  import { getFirebaseAuth, getFirebaseDb, getFirebaseFunctions } from "../lib/firebase/client";
   import { upsertUserProfile } from "../lib/portal/profile";
   import { getMembershipStatus } from "../lib/portal/membership";
   import { subscribeToMessages, sendMessage, type PortalMessage } from "../lib/portal/messaging";
 
   const auth = getFirebaseAuth();
   const db   = getFirebaseDb();
+  const fns  = getFirebaseFunctions();
 
   // ── State helpers ──
   type State = "loading" | "subscribe" | "lapsed" | "portal";
@@ -138,13 +140,22 @@ import Layout from "../layouts/Layout.astro";
     const isClient = sender === "client";
     const time = timestamp?.toDate ? timestamp.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
 
+    const message = document.createElement("div");
+    message.className = `message ${isClient ? "message--client" : "message--consultant"}`;
+
     const bubble = document.createElement("div");
-    bubble.className = `message ${isClient ? "message--client" : "message--consultant"}`;
-    bubble.innerHTML = `
-      <div class="bubble">${text.replace(/</g,"&lt;").replace(/\n/g,"<br>")}</div>
-      ${time ? `<span class="message-time">${time}</span>` : ""}
-    `;
-    list.appendChild(bubble);
+    bubble.className = "bubble";
+    bubble.textContent = text;
+    message.appendChild(bubble);
+
+    if (time) {
+      const timeEl = document.createElement("span");
+      timeEl.className = "message-time";
+      timeEl.textContent = time;
+      message.appendChild(timeEl);
+    }
+
+    list.appendChild(message);
 
     // Scroll to bottom
     const wrap = document.getElementById("messages-wrap") as HTMLElement;
@@ -201,14 +212,30 @@ import Layout from "../layouts/Layout.astro";
     window.location.href = "/login";
   });
 
-  // ── Subscription buttons (Stripe — Phase 2) ──
-  async function startCheckout() {
-    // TODO: call Firebase Function createCheckoutSession when Stripe is set up
-    window.location.href = "/contact?inquiry=ai-strategy&note=subscription";
+  // ── Subscription buttons (Stripe) ──
+  async function startCheckout(btn: HTMLButtonElement) {
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Redirecting to checkout…";
+
+    try {
+      const createCheckoutSession = httpsCallable<Record<string, never>, { url: string }>(
+        fns, "createCheckoutSession"
+      );
+      const { data } = await createCheckoutSession({});
+      window.location.href = data.url;
+    } catch (err) {
+      console.error("Could not start checkout:", err);
+      // Fall back to the contact form so the lead isn't lost
+      window.location.href = "/contact?inquiry=ai-strategy&note=subscription";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
   }
 
-  document.getElementById("subscribe-btn")?.addEventListener("click",    startCheckout);
-  document.getElementById("reactivate-btn")?.addEventListener("click",   startCheckout);
+  document.getElementById("subscribe-btn")?.addEventListener("click",  (e) => startCheckout(e.currentTarget as HTMLButtonElement));
+  document.getElementById("reactivate-btn")?.addEventListener("click", (e) => startCheckout(e.currentTarget as HTMLButtonElement));
 
   // ── Auth gate ──
   onAuthStateChanged(auth, async (user) => {
@@ -419,6 +446,7 @@ import Layout from "../layouts/Layout.astro";
     padding: 0.75rem 1rem; border-radius: 16px;
     font-size: 0.9375rem; line-height: 1.55;
     word-break: break-word;
+    white-space: pre-wrap;
   }
 
   .message--client .bubble {

@@ -339,7 +339,7 @@ import NeuralPhoenixLogo from "../components/NeuralPhoenixLogo.astro";
       const code = err?.code ?? "";
       if (code === "unauthenticated") {
         // Not logged in — redirect to login, then return here
-        window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
+        window.location.href = `/login?redirect=${encodeURIComponent(returnTo)}`;
         return;
       }
       setError(
@@ -351,10 +351,13 @@ import NeuralPhoenixLogo from "../components/NeuralPhoenixLogo.astro";
   // ── Entry point: wait for Firebase Auth to resolve ──
   const sessionId = new URLSearchParams(window.location.search).get("session_id");
 
+  // Relative URL for the post-login redirect (login only accepts same-origin paths)
+  const returnTo = `${window.location.pathname}${window.location.search}`;
+
   onAuthStateChanged(auth, (user) => {
     if (!user) {
       // Not authenticated — redirect to login
-      window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
+      window.location.href = `/login?redirect=${encodeURIComponent(returnTo)}`;
       return;
     }
     // Auth resolved — now verify subscription with server
