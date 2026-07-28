@@ -24,17 +24,22 @@ function requireString(value: unknown, field: string, maxLength: number): string
 }
 
 /**
- * submitContactForm
+ * submitContactFormFn
  *
- * Called by the public /contact page (no auth required). Validates the
- * enquiry server-side and stores it in the `contactSubmissions` collection,
- * which is only readable/writable via the Admin SDK (locked down in
- * firestore.rules).
+ * Server-side alternative to src/lib/contact/submit.ts's client-side write —
+ * NOT currently deployed or called by /contact (see README.md). Named
+ * distinctly from that client-side function to avoid the two being confused
+ * for one another during troubleshooting.
+ *
+ * Would be called by the public /contact page (no auth required). Validates
+ * the enquiry server-side and stores it in the `contactSubmissions`
+ * collection, which is only readable/writable via the Admin SDK (locked
+ * down in firestore.rules).
  *
  * Notification emails can be layered on top with the "Trigger Email"
  * Firebase Extension watching this collection, without changing this code.
  */
-export const submitContactForm = onCall(async (request) => {
+export const submitContactFormFn = onCall(async (request) => {
   const data = (request.data ?? {}) as ContactFormData;
 
   const name = requireString(data.name, "name", 200);

@@ -25,7 +25,7 @@ A premium, multi-page consultancy website for an AI Strategy, Data Science, and 
 | Database | Firestore | Leads, user profiles, membership status, portal messages |
 | Analytics | Firebase Analytics | Page views, CTA tracking |
 
-**Contact form note:** a proper server-side `submitContactForm` Cloud Function exists in `functions/src/` (validates input, writes to Firestore via Admin SDK), but it is **not currently deployed**. `/contact` currently submits directly from the browser to the `contactSubmissions` Firestore collection, validated by `firestore.rules` schema checks rather than a Cloud Function. Deploying the function and switching `/contact` to call it is a drop-in upgrade — no rearchitecting needed.
+**Contact form note:** a proper server-side `submitContactFormFn` Cloud Function exists in `functions/src/` (validates input, writes to Firestore via Admin SDK), but it is **not currently deployed** and is deliberately named differently from `src/lib/contact/submit.ts`'s `submitContactForm` (the client-side function that's actually live) to avoid the two being confused during troubleshooting. `/contact` currently submits directly from the browser to the `contactSubmissions` Firestore collection, validated by `firestore.rules` schema checks rather than a Cloud Function. Deploying the function and switching `/contact` to call it is a drop-in upgrade — no rearchitecting needed.
 
 ---
 
@@ -96,7 +96,7 @@ ai-empowerment-group/
 │   └── src/
 │       ├── index.ts
 │       ├── firebase.ts              # Shared Admin SDK init
-│       ├── submitContactForm.ts     # Stores contact enquiries in Firestore (not yet deployed)
+│       ├── submitContactFormFn.ts   # Stores contact enquiries in Firestore (not yet deployed)
 │       ├── verifySubscription.ts    # Called by /success after checkout
 │       ├── createCheckoutSession.ts # Creates Stripe Checkout session
 │       └── stripeWebhook.ts         # Syncs membershipStatus from Stripe

@@ -1,4 +1,4 @@
 export { verifySubscription } from "./verifySubscription";
-export { submitContactForm } from "./submitContactForm";
+export { submitContactFormFn } from "./submitContactFormFn";
 export { createCheckoutSession } from "./createCheckoutSession";
 export { stripeWebhook } from "./stripeWebhook";
