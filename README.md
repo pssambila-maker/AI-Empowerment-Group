@@ -55,6 +55,7 @@ A premium, multi-page consultancy website for an AI Strategy, Data Science, and 
 /payment-cancelled       → User cancelled checkout page
 /portal                  → Protected client portal (paid members only)
 /accessibility           → WCAG 2.1 statement (footer link)
+/admin                   → Owner-only dashboard (leads, class registrations, contact inquiries) — not linked in nav, no public entry point
 ```
 
 ---

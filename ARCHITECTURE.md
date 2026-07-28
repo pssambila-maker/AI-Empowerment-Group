@@ -12,8 +12,10 @@ This is the deep-dive companion to `README.md`. Read `README.md` first for the s
 | How the score is calculated | `src/lib/assessment/scoring.ts` |
 | The recurring class's day/time/join link | `src/config/assessment.ts`'s `CLASS_SCHEDULE` |
 | The class-invite email's copy | `src/lib/assessment/emailTemplates.ts` |
-| Who's registered for the class (viewing) | Firebase Console → Firestore → `classRegistrations` collection — clean, dedicated records (name/email/score/classDate), separate from `mail`'s outgoing-email queue |
+| Who's registered for the class, taken the assessment, or sent an inquiry | `/admin` page (owner-only — see below), or Firebase Console → Firestore → `leads`/`classRegistrations`/`contactSubmissions` collections directly |
 | Who's registered for the class (code) | `src/lib/assessment/registrations.ts` |
+| Admin dashboard queries/page | `src/lib/admin/data.ts`, `src/pages/admin.astro` |
+| Who's allowed to view `/admin` | `src/config/admin.ts`'s `ADMIN_EMAIL` — **must also be updated in `firestore.rules`'s `isAdmin()` if changed, since rules can't import TS config** |
 | Assessment funnel screen order/wiring | `src/lib/assessment/controller.ts` |
 | One funnel step's markup/styling | `src/components/assessment/*.astro` (one file per step) |
 | Portal membership/paywall logic | `src/lib/portal/membership.ts` |
@@ -57,6 +59,10 @@ Two independent things affect this, check both:
 ### "auth/unauthorized-continue-uri" or "auth/unauthorized-domain" errors
 
 The domain the sign-in-link request came from (or the `continueUrl` passed to it) isn't in Firebase Console → Authentication → Settings → Authorized domains. Note: **Firebase Hosting's connected custom domain and Auth's authorized-domains list are two separate settings** — connecting a domain in Hosting does not automatically authorize it for Auth. This project has two similarly-named domains in play historically (`aiempoweredgroup.com`, the real one, vs. `aiempowermentgroup.com`, an unrelated old site) — if you ever see a "wrong site" surprise, check which exact domain you're looking at character-by-character before assuming a deeper bug.
+
+### "/admin shows 'Not Authorized' even for the real owner"
+
+The check is an exact string match on `request.auth.token.email` (in `firestore.rules`'s `isAdmin()`) against a hardcoded email, plus a matching client-side check in `admin.astro` against `src/config/admin.ts`'s `ADMIN_EMAIL`. Common causes: signed in with a different email/provider than expected (e.g. Google OAuth using a different address than the one on file), a typo/case mismatch between the two hardcoded copies of the email (rules can't import the TS config, so they're two separate literals that must be kept in sync by hand), or the rules change was made locally but never deployed (`firebase deploy --only firestore:rules` — see the repo/production drift entry above, this exact class of bug has happened before in this project).
 
 ### "I changed something and I'm not sure what else it touches"
 

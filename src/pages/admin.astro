@@ -1,0 +1,258 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Admin" description="Owner-only dashboard.">
+
+  <div id="state-loading" class="full-center">
+    <div class="spinner" aria-label="Loading"></div>
+    <p>Loading&hellip;</p>
+  </div>
+
+  <div id="state-denied" class="full-center" hidden>
+    <h1>Not Authorized</h1>
+    <p class="sub-text">This page is restricted to the site owner.</p>
+    <a href="/" class="btn-ghost">Back to Home</a>
+  </div>
+
+  <main id="state-admin" class="admin-page" hidden>
+    <header class="admin-header">
+      <h1>Admin</h1>
+      <button type="button" id="refresh-btn" class="btn-ghost">&#x21bb; Refresh</button>
+    </header>
+
+    <section class="admin-section">
+      <h2>Assessment Leads <span id="leads-count" class="count-badge"></span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Score</th><th>Category</th></tr>
+          </thead>
+          <tbody id="leads-body"></tbody>
+        </table>
+        <p id="leads-empty" class="empty-note" hidden>No assessment leads yet.</p>
+      </div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Class Registrations <span id="registrations-count" class="count-badge"></span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Registered</th><th>Name</th><th>Email</th><th>Score</th><th>Role</th><th>Class Date</th></tr>
+          </thead>
+          <tbody id="registrations-body"></tbody>
+        </table>
+        <p id="registrations-empty" class="empty-note" hidden>No class registrations yet.</p>
+      </div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Contact Inquiries <span id="inquiries-count" class="count-badge"></span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Name</th><th>Email</th><th>Country</th><th>Inquiry</th><th>Message</th></tr>
+          </thead>
+          <tbody id="inquiries-body"></tbody>
+        </table>
+        <p id="inquiries-empty" class="empty-note" hidden>No contact inquiries yet.</p>
+      </div>
+    </section>
+  </main>
+
+</Layout>
+
+<script>
+  import { onAuthStateChanged } from "firebase/auth";
+  import { getFirebaseAuth, getFirebaseDb } from "../lib/firebase/client";
+  import { fetchLeads, fetchClassRegistrations, fetchContactSubmissions } from "../lib/admin/data";
+  import { ADMIN_EMAIL } from "../config/admin";
+
+  const auth = getFirebaseAuth();
+  const db = getFirebaseDb();
+
+  type State = "loading" | "denied" | "admin";
+  function show(state: State) {
+    (["loading", "denied", "admin"] as State[]).forEach((s) => {
+      const el = document.getElementById(`state-${s}`) as HTMLElement;
+      if (el) el.hidden = s !== state;
+    });
+  }
+
+  function esc(value: string): string {
+    return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function fmtDate(d: Date | null): string {
+    if (!d) return "—";
+    return d.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+  }
+
+  async function loadData() {
+    const [leads, registrations, inquiries] = await Promise.all([
+      fetchLeads(db),
+      fetchClassRegistrations(db),
+      fetchContactSubmissions(db),
+    ]);
+
+    const leadsBody = document.getElementById("leads-body") as HTMLElement;
+    leadsBody.innerHTML = leads
+      .map(
+        (l) =>
+          `<tr><td>${fmtDate(l.createdAt)}</td><td>${esc(l.fullName)}</td><td>${esc(l.email)}</td><td>${esc(l.phone)}</td><td>${esc(l.role)}</td><td>${l.score}</td><td>${esc(l.category)}</td></tr>`,
+      )
+      .join("");
+    (document.getElementById("leads-count") as HTMLElement).textContent = `(${leads.length})`;
+    (document.getElementById("leads-empty") as HTMLElement).hidden = leads.length > 0;
+
+    const regBody = document.getElementById("registrations-body") as HTMLElement;
+    regBody.innerHTML = registrations
+      .map(
+        (r) =>
+          `<tr><td>${fmtDate(r.registeredAt)}</td><td>${esc(r.fullName)}</td><td>${esc(r.email)}</td><td>${r.score}</td><td>${esc(r.role)}</td><td>${r.classDate ? new Date(r.classDate).toLocaleDateString() : "—"}</td></tr>`,
+      )
+      .join("");
+    (document.getElementById("registrations-count") as HTMLElement).textContent = `(${registrations.length})`;
+    (document.getElementById("registrations-empty") as HTMLElement).hidden = registrations.length > 0;
+
+    const inqBody = document.getElementById("inquiries-body") as HTMLElement;
+    inqBody.innerHTML = inquiries
+      .map(
+        (i) =>
+          `<tr><td>${fmtDate(i.createdAt)}</td><td>${esc(i.name)}</td><td>${esc(i.email)}</td><td>${esc(i.country)}</td><td>${esc(i.inquiry)}</td><td class="msg-cell">${esc(i.message)}</td></tr>`,
+      )
+      .join("");
+    (document.getElementById("inquiries-count") as HTMLElement).textContent = `(${inquiries.length})`;
+    (document.getElementById("inquiries-empty") as HTMLElement).hidden = inquiries.length > 0;
+  }
+
+  document.getElementById("refresh-btn")?.addEventListener("click", () => void loadData());
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "/login?redirect=/admin";
+      return;
+    }
+    if (user.email !== ADMIN_EMAIL) {
+      show("denied");
+      return;
+    }
+    show("admin");
+    try {
+      await loadData();
+    } catch (err) {
+      console.error("Failed to load admin data:", err);
+    }
+  });
+</script>
+
+<style>
+  .full-center {
+    min-height: calc(100vh - 68px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: 2rem;
+    text-align: center;
+    background: var(--color-charcoal);
+  }
+
+  .full-center h1 { font-family: var(--font-heading); font-size: 1.75rem; color: var(--color-gold); }
+  .sub-text { color: rgba(245,245,240,0.65); }
+
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid rgba(201,168,76,0.2);
+    border-top-color: var(--color-gold);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .btn-ghost {
+    color: var(--color-mid-grey);
+    font-size: 0.875rem;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-ghost:hover { color: var(--color-gold); }
+
+  .admin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .admin-header h1 {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-gold);
+  }
+
+  .admin-section h2 {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-off-white);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .count-badge {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-mid-grey);
+  }
+
+  .table-wrap {
+    background: #1e1e1e;
+    border: 1px solid rgba(245,245,240,0.08);
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+
+  th, td {
+    padding: 0.7rem 1rem;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(245,245,240,0.06);
+  }
+
+  .msg-cell { white-space: normal; max-width: 22rem; }
+
+  th {
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    background: rgba(201,168,76,0.05);
+  }
+
+  td { color: rgba(245,245,240,0.85); }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(245,245,240,0.02); }
+
+  .empty-note { padding: 1.25rem; color: var(--color-mid-grey); font-size: 0.875rem; }
+</style>

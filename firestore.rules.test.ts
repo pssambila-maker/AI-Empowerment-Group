@@ -288,6 +288,52 @@ describe("contactSubmissions/{submissionId}", () => {
   });
 });
 
+describe("admin read access (/admin page)", () => {
+  const ADMIN_EMAIL = "eus.java@gmail.com";
+
+  it("allows the admin email to read leads, classRegistrations, and contactSubmissions", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      const adminSeedDb = ctx.firestore();
+      await addDoc(collection(adminSeedDb, "leads"), { uid: "alice", email: "a@b.com", score: 50 });
+      await addDoc(collection(adminSeedDb, "classRegistrations"), {
+        uid: "alice", email: "a@b.com", fullName: "Alice", score: 50,
+      });
+      await addDoc(collection(adminSeedDb, "contactSubmissions"), {
+        name: "Jane", email: "jane@example.com", country: "UK", inquiry: "general",
+        message: "A perfectly ordinary enquiry message.",
+      });
+    });
+
+    const { getDocs } = await import("firebase/firestore");
+    const adminDb = testEnv.authenticatedContext("owner-uid", { email: ADMIN_EMAIL }).firestore();
+
+    await assertSucceeds(getDocs(collection(adminDb, "leads")));
+    await assertSucceeds(getDocs(collection(adminDb, "classRegistrations")));
+    await assertSucceeds(getDocs(collection(adminDb, "contactSubmissions")));
+  });
+
+  it("denies a different authenticated user, even with a similar email, from reading any of the three", async () => {
+    const { getDocs } = await import("firebase/firestore");
+    const notAdminDb = testEnv
+      .authenticatedContext("random-uid", { email: "not-the-admin@example.com" })
+      .firestore();
+
+    await assertFails(getDocs(collection(notAdminDb, "leads")));
+    await assertFails(getDocs(collection(notAdminDb, "classRegistrations")));
+    await assertFails(getDocs(collection(notAdminDb, "contactSubmissions")));
+  });
+
+  it("still denies the admin from updating or deleting — read-only access", async () => {
+    let leadId = "";
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      const ref = await addDoc(collection(ctx.firestore(), "leads"), { uid: "alice", email: "a@b.com", score: 50 });
+      leadId = ref.id;
+    });
+    const adminDb = testEnv.authenticatedContext("owner-uid", { email: ADMIN_EMAIL }).firestore();
+    await assertFails(updateDoc(doc(adminDb, "leads", leadId), { score: 100 }));
+  });
+});
+
 describe("everything else (default deny)", () => {
   it("denies read/write to any collection with no explicit rule", async () => {
     const db = testEnv.authenticatedContext("alice").firestore();

@@ -22,7 +22,7 @@ test.describe("miscellaneous pages", () => {
   test("no page renders a dollar-amount price anywhere", async ({ page }) => {
     const pages = [
       "/", "/bio", "/services", "/case-studies", "/testimonials",
-      "/contact", "/login", "/portal", "/success", "/payment-cancelled", "/accessibility",
+      "/contact", "/login", "/portal", "/success", "/payment-cancelled", "/accessibility", "/admin",
     ];
     for (const path of pages) {
       await page.goto(path);
