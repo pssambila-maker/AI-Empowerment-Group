@@ -68,6 +68,52 @@ describe("leads/{leadId}", () => {
   });
 });
 
+describe("classRegistrations/{registrationId}", () => {
+  const validRegistration = {
+    uid: "alice",
+    email: "alice@example.com",
+    fullName: "Alice Example",
+    score: 72,
+    role: "individual",
+    classDate: "2026-08-16T13:00:00.000Z",
+  };
+
+  it("denies an unauthenticated create", async () => {
+    const db = testEnv.unauthenticatedContext().firestore();
+    await assertFails(addDoc(collection(db, "classRegistrations"), validRegistration));
+  });
+
+  it("denies create when uid doesn't match the caller", async () => {
+    const db = testEnv.authenticatedContext("alice").firestore();
+    await assertFails(
+      addDoc(collection(db, "classRegistrations"), { ...validRegistration, uid: "someone-else" }),
+    );
+  });
+
+  it("denies create when email/fullName/score have the wrong type", async () => {
+    const db = testEnv.authenticatedContext("alice").firestore();
+    await assertFails(
+      addDoc(collection(db, "classRegistrations"), { ...validRegistration, email: 12345, score: "high" }),
+    );
+  });
+
+  it("allows a matching, well-typed create", async () => {
+    const db = testEnv.authenticatedContext("alice").firestore();
+    await assertSucceeds(addDoc(collection(db, "classRegistrations"), validRegistration));
+  });
+
+  it("denies read/update/delete from any client", async () => {
+    let registrationId = "";
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      const ref = await addDoc(collection(ctx.firestore(), "classRegistrations"), validRegistration);
+      registrationId = ref.id;
+    });
+    const db = testEnv.authenticatedContext("alice").firestore();
+    await assertFails(getDoc(doc(db, "classRegistrations", registrationId)));
+    await assertFails(updateDoc(doc(db, "classRegistrations", registrationId), { score: 100 }));
+  });
+});
+
 describe("mail/{mailId}", () => {
   it("denies an unauthenticated create", async () => {
     const db = testEnv.unauthenticatedContext().firestore();

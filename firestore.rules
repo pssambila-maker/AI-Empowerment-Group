@@ -23,6 +23,19 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
 
+    // Records of who registered for the free class — separate from `mail`
+    // (the outgoing-email queue) so it's a clean, readable-by-nobody-but-
+    // the-owner report. Create-only, no client read (reviewed via Firebase
+    // Console, same pattern as `leads`).
+    match /classRegistrations/{registrationId} {
+      allow create: if request.auth != null
+                     && request.resource.data.uid == request.auth.uid
+                     && request.resource.data.email is string
+                     && request.resource.data.fullName is string
+                     && request.resource.data.score is number;
+      allow read, update, delete: if false;
+    }
+
     // Fields only Cloud Functions (Admin SDK, which bypasses these rules)
     // may write — clients must never grant themselves membership or forge
     // Stripe identifiers. See STRIPE_INTEGRATION.md.

@@ -18,6 +18,7 @@ import {
 import { calculateScore, scoreToNeedleAngle } from "./scoring";
 import { saveLead } from "./leads";
 import { sendClassInviteEmail } from "./mail";
+import { saveClassRegistration } from "./registrations";
 import {
   buildGoogleCalendarUrl,
   buildIcsContent,
@@ -491,6 +492,22 @@ async function handleRegisterForClass(db: ReturnType<typeof getFirebaseDb>) {
 
   try {
     await sendClassInviteEmail(db, { to: state.email, name: state.fullName, score: state.lastScore });
+
+    // Best-effort — a clean, dedicated record of who registered (separate
+    // from `mail`, which is just the outgoing-email queue). A failure here
+    // shouldn't block the registration the visitor actually cares about.
+    const uid = getFirebaseAuth().currentUser?.uid;
+    if (uid) {
+      void saveClassRegistration(db, {
+        uid,
+        email: state.email,
+        fullName: state.fullName,
+        score: state.lastScore,
+        role: state.role,
+        classDate: getNextClassOccurrence().start.toISOString(),
+      });
+    }
+
     $("class-unregistered").hidden = true;
     $("class-registered").hidden = false;
   } catch {

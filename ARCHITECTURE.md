@@ -12,6 +12,8 @@ This is the deep-dive companion to `README.md`. Read `README.md` first for the s
 | How the score is calculated | `src/lib/assessment/scoring.ts` |
 | The recurring class's day/time/join link | `src/config/assessment.ts`'s `CLASS_SCHEDULE` |
 | The class-invite email's copy | `src/lib/assessment/emailTemplates.ts` |
+| Who's registered for the class (viewing) | Firebase Console → Firestore → `classRegistrations` collection — clean, dedicated records (name/email/score/classDate), separate from `mail`'s outgoing-email queue |
+| Who's registered for the class (code) | `src/lib/assessment/registrations.ts` |
 | Assessment funnel screen order/wiring | `src/lib/assessment/controller.ts` |
 | One funnel step's markup/styling | `src/components/assessment/*.astro` (one file per step) |
 | Portal membership/paywall logic | `src/lib/portal/membership.ts` |
