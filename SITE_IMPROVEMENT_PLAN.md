@@ -50,9 +50,8 @@ Site owner's explicit instruction: no prices should appear anywhere on the site.
 "Not a client yet?" on `/login` (`src/pages/login.astro`) links only to `/contact`, a dead end for someone who just wants to explore services.
 **Fix:** change that link to `/services`, or add a secondary link to the free `/assessment` — a much lower-friction next step for someone not ready to talk to a consultant yet.
 
-### 2.5 "Deep Dive → Blueprint → Shield" naming
-In `src/components/HowIWork.astro` — "Shield" doesn't parallel "Deep Dive"/"Blueprint" stylistically; reads as a forced alliterative flourish for the security-specific step.
-**Fix:** this is a brand-voice call, not an objective bug — propose 2-3 alternative three-step names to the site owner (e.g., "Discover → Design → Defend", or keep as-is if they like it) rather than silently renaming it.
+### 2.5 "Deep Dive → Blueprint → Shield" naming — DECIDED (2026-07-28): keep as-is
+Presented the site owner with options ("The Shield" as-is / "The Handover" / "The Build"), shown in context against the card's actual body copy. Decision: **keep "The Shield"** — it ties thematically to the Cyber Threat Hunting service pillar. No code change needed.
 
 ## 3. Content/credibility work — needs the site owner, cannot be done by an agent alone
 
@@ -76,7 +75,7 @@ None of the testimonials have a person's actual name — only role + sector. Sam
 3. ~~Fix the login self-serve link (§2.4)~~ — **DONE.**
 4. ~~Remove pricing (§2.2)~~ — **DONE.** ~~Add direct contact info (§2.3)~~ — **DONE** (info@estaiconsulting.com, (248) 943-0589).
 5. ~~Add interim anonymization disclaimer to case studies/testimonials (§3.1, §3.2)~~ — **DONE.** Real, permissioned case studies/testimonials remain a future task whenever available — not a blocker.
-6. **Still open:** §2.5 "Deep Dive / Blueprint / Shield" naming — site owner's call, not yet made.
+6. ~~§2.5 "Deep Dive / Blueprint / Shield" naming~~ — **DONE, kept as-is.**
 7. **Not yet done:** run `npm run build` one final time to confirm everything together, then **explicitly confirm with the site owner** before `firebase deploy --only hosting` (and `firestore:rules`/`functions` if anything in those changed since the last rules deploy).
 8. **After deploying, re-verify directly against `https://aiempoweredgroup.com/`** — do not assume local build success means production is fixed. This project has hit repo/production drift twice already; treat "looks right in `npm run dev`" as necessary but not sufficient.
 9. Optional but recommended: re-run an independent critique pass against the live site after deploying, the same way the original critique was produced, to confirm the fixes actually landed as intended rather than trusting self-assessment.
