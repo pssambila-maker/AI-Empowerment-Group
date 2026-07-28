@@ -17,10 +17,7 @@
    - Assessment "3 Key Insights" showing empty: **this repo's `src/config/assessment.ts` has real, populated `insights` text for every score band.** The live site rendering them empty is again a defect specific to the diverged build.
    - **Implication: simply redeploying this repo's `dist/` to Hosting will silently fix both of the above**, as a side effect, with no additional code change needed.
 
-4. **The trade-off this creates, and the first real decision point:** redeploying this repo reverts the assessment funnel to this repo's flow order (email-verification-before-questions), losing the live version's more advanced (questions-before-email) UX. Two paths:
-   - **Path A (recommended, faster):** accept the reversion now to eliminate the empty-insights/missing-alt-text defects immediately; treat re-adding the "answer questions before verifying email" flow as a separate, later UX improvement task, designed and built fresh in this repo (not reconstructed from minified JS).
-   - **Path B (slower, more faithful):** before deploying anything, first reconstruct the live flow order in this repo's `src/lib/assessment/controller.ts` / `src/components/assessment/*`, using what can be partially recovered from the deployed JS (fetchable at `https://aiempoweredgroup.com/_astro/hoisted.*.js` — grep for `assessment-gateway`, `awaitingEmailConfirmation`, the `Ee()`-equivalent progress-check function, and the friendly per-error-code strings) as a reference, then deploy the reconciled version.
-   - **Do not silently pick one — this needs the site owner's explicit call before any hosting deploy happens.** Everything below assumes Path A unless told otherwise, since it's lower-risk and faster to ship, but flag this decision before executing.
+4. **DECIDED (2026-07-28): Path A.** Site owner chose the simpler option — accept the reversion to this repo's flow order (Gateway → Email verification → Profile → Questions → Results), eliminating the empty-insights/missing-alt-text defects immediately with no reconstruction work. The live site's "answer questions before verifying email" UX will be lost on next hosting deploy; re-adding something like it, if wanted, is a separate future task designed fresh in this repo — not a blocker for this plan. No further action needed for this item; it's just a property of deploying this repo as-is.
 
 5. **Nothing in this repo has been deployed to Hosting recently** (the last hosting deploy, 2026-07-24, is the diverged version described above). `firestore.rules` deploys are current as of this session. Any `firebase deploy --only hosting` (or `hosting,firestore:rules,functions`) is a real, visible production change — confirm with the site owner immediately before running it, the same way past Firestore rules deploys and `git push` were confirmed individually in this project's history.
 
@@ -72,16 +69,17 @@ None of the testimonials have a person's actual name — only role + sector. Sam
 
 ---
 
-## 4. Suggested execution order
+## 4. Execution order — status as of 2026-07-28
 
-1. **Get the site owner's decision on §0.4** (Path A vs Path B for the assessment flow) before doing anything else — it determines whether step 6 below is "just deploy" or "reconstruct the flow first, then deploy."
-2. Build `src/pages/404.astro` (§2.1) — self-contained, no dependencies, do this regardless of the Path A/B decision.
-3. Fix the login self-serve link (§2.4) — trivial, one-line change.
-4. Present the pricing (§2.2), direct-contact (§2.3), and "Shield" naming (§2.5) items to the site owner as open questions needing their input — do not guess at answers.
-5. Present the case-study/testimonial options (§3.1, §3.2) to the site owner — implement whichever they choose (real content, or the interim anonymization label, or both in sequence).
-6. Once §0.4 is decided: either deploy as-is (Path A) or reconstruct the flow order first (Path B), then run `npm run build` and confirm cleanly, then **explicitly confirm with the site owner** before `firebase deploy --only hosting` (and `firestore:rules`/`functions` if anything in those changed).
-7. **After deploying, re-verify directly against `https://aiempoweredgroup.com/` — do not assume local build success means production is fixed.** This project has hit repo/production drift twice already; treat "looks right in `npm run dev`" as necessary but not sufficient.
-8. Optional but recommended: re-run an independent critique pass against the live site after deploying, the same way the original critique was produced, to confirm the fixes actually landed as intended rather than trusting self-assessment.
+1. ~~Get the site owner's decision on §0.4~~ — **DONE, Path A.** See §0.4 above.
+2. ~~Build `src/pages/404.astro` (§2.1)~~ — **DONE.**
+3. ~~Fix the login self-serve link (§2.4)~~ — **DONE.**
+4. ~~Remove pricing (§2.2)~~ — **DONE.** ~~Add direct contact info (§2.3)~~ — **DONE** (info@estaiconsulting.com, (248) 943-0589).
+5. ~~Add interim anonymization disclaimer to case studies/testimonials (§3.1, §3.2)~~ — **DONE.** Real, permissioned case studies/testimonials remain a future task whenever available — not a blocker.
+6. **Still open:** §2.5 "Deep Dive / Blueprint / Shield" naming — site owner's call, not yet made.
+7. **Not yet done:** run `npm run build` one final time to confirm everything together, then **explicitly confirm with the site owner** before `firebase deploy --only hosting` (and `firestore:rules`/`functions` if anything in those changed since the last rules deploy).
+8. **After deploying, re-verify directly against `https://aiempoweredgroup.com/`** — do not assume local build success means production is fixed. This project has hit repo/production drift twice already; treat "looks right in `npm run dev`" as necessary but not sufficient.
+9. Optional but recommended: re-run an independent critique pass against the live site after deploying, the same way the original critique was produced, to confirm the fixes actually landed as intended rather than trusting self-assessment.
 
 ---
 
