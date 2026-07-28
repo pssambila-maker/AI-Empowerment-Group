@@ -128,21 +128,33 @@
     padding-right: 0.25rem;
   }
 
-  .checklist-item {
+  /* checklist-item and choice-option (below) are created dynamically by
+     controller.ts via document.createElement, not present in this
+     component's own template — Astro's scoped-style attribute is only ever
+     applied to elements that exist in the template at build time, so these
+     rules must be :global() or they silently never match, falling back to
+     unstyled browser defaults (plain checkboxes, default button chrome). */
+  :global(.checklist-item) {
     display: flex;
     align-items: flex-start;
     gap: 0.875rem;
     padding: 0.875rem 1rem;
     background: var(--color-charcoal);
-    border: 1px solid rgba(245,245,240,0.1);
+    border: 1.5px solid rgba(245,245,240,0.1);
     border-radius: 4px;
     cursor: pointer;
-    transition: border-color 0.15s ease;
+    transition: border-color 0.15s ease, background 0.15s ease;
   }
 
-  .checklist-item:hover { border-color: var(--color-gold); }
+  :global(.checklist-item:hover) { border-color: var(--color-gold); }
 
-  .checklist-item input {
+  /* Visual confirmation of a checked item — mirrors .choice-option.selected below. */
+  :global(.checklist-item:has(input:checked)) {
+    border-color: var(--color-gold);
+    background: rgba(201,168,76,0.08);
+  }
+
+  :global(.checklist-item input) {
     margin-top: 0.2rem;
     accent-color: var(--color-gold);
     width: 1rem;
@@ -150,7 +162,7 @@
     flex-shrink: 0;
   }
 
-  .checklist-item span {
+  :global(.checklist-item span) {
     font-size: 0.9375rem;
     color: var(--color-off-white);
     line-height: 1.5;
@@ -159,14 +171,14 @@
   /* Choice options */
   .choice-options { display: flex; flex-direction: column; gap: 0.75rem; }
 
-  .choice-option {
+  :global(.choice-option) {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
     padding: 0.9rem 1.1rem;
     background: var(--color-charcoal);
-    border: 1px solid rgba(245,245,240,0.1);
+    border: 1.5px solid rgba(245,245,240,0.1);
     border-radius: 4px;
     color: var(--color-off-white);
     font-size: 0.9375rem;
@@ -176,14 +188,14 @@
     transition: border-color 0.15s ease, background 0.15s ease;
   }
 
-  .choice-option:hover { border-color: var(--color-gold); }
+  :global(.choice-option:hover) { border-color: var(--color-gold); }
 
-  .choice-option.selected {
+  :global(.choice-option.selected) {
     border-color: var(--color-gold);
     background: rgba(201,168,76,0.08);
   }
 
-  .choice-option .pts {
+  :global(.choice-option .pts) {
     font-family: var(--font-heading);
     font-size: 0.75rem;
     font-weight: 700;

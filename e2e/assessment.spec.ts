@@ -67,4 +67,61 @@ test.describe("/assessment", () => {
       await deleteApp(app).catch(() => {});
     }
   });
+
+  test("checklist and choice-question options render themed (not unstyled defaults), and change color when selected", async ({ page }) => {
+    // Regression guard for a real bug: .checklist-item and .choice-option
+    // are created dynamically in controller.ts via document.createElement,
+    // not present in QuestionFlow.astro's own template — Astro's scoped-CSS
+    // attribute is only ever applied to elements that exist in the template
+    // at build time, so those rules silently never matched these elements,
+    // falling back to unstyled browser defaults (plain checkboxes, default
+    // white/gray buttons) despite the CSS looking correct in source.
+    const email = `e2e-question-style-${Date.now()}@example.com`;
+    const password = "E2eQuestionStyle123!";
+    const app = initializeApp(firebaseConfig, `e2e-question-style-${Date.now()}`);
+    const auth = getAuth(app);
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+    try {
+      await page.goto("/login");
+      await page.fill("#email", email);
+      await page.fill("#password", password);
+      await page.click("#login-btn");
+      await page.waitForURL(/\/portal/, { timeout: 10000 });
+
+      await page.goto("/assessment");
+      await page.click("#gateway-individual"); // already signed in -> lands directly on profile form
+      await page.fill("#profile-fullname", "Question Style Check");
+      await page.click("#profile-submit-btn");
+
+      const item = page.locator(".checklist-item").first();
+      await expect(item).toBeVisible();
+      const uncheckedStyle = await item.evaluate((el) => getComputedStyle(el).backgroundColor);
+      expect(uncheckedStyle).toBe("rgb(45, 45, 45)"); // var(--color-charcoal), NOT browser-default transparent/white
+
+      await item.locator("input[type=checkbox]").check();
+      await page.waitForTimeout(250); // let the 0.15s border-color transition finish before reading it
+      const checkedStyle = await page
+        .locator(".checklist-item", { has: page.locator("input:checked") })
+        .first()
+        .evaluate((el) => getComputedStyle(el).borderColor);
+      expect(checkedStyle).toContain("201, 168, 76"); // gold border once checked — visibly different from unchecked
+
+      await page.click("#checklist-next-btn");
+      const option = page.locator(".choice-option").first();
+      await expect(option).toBeVisible();
+      const unselectedBg = await option.evaluate((el) => getComputedStyle(el).backgroundColor);
+      expect(unselectedBg).toBe("rgb(45, 45, 45)");
+
+      await option.click();
+      const selected = page.locator(".choice-option.selected").first();
+      await expect(selected).toBeVisible();
+      await page.waitForTimeout(250); // let the 0.15s background transition finish before reading it
+      const selectedBg = await selected.evaluate((el) => getComputedStyle(el).backgroundColor);
+      expect(selectedBg).not.toBe(unselectedBg); // visibly changed color once selected
+    } finally {
+      await deleteUser(cred.user).catch(() => {});
+      await deleteApp(app).catch(() => {});
+    }
+  });
 });
