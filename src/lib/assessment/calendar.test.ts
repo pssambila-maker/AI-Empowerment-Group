@@ -7,10 +7,10 @@ import {
   buildIcsContent,
 } from "./calendar";
 
-// CLASS_SCHEDULE (src/config/assessment.ts) is Saturday 9:00-11:00 AM
-// America/New_York. These tests pin "now" to specific real dates that are
-// known to fall on either side of the US DST transition, since that's the
-// one part of this logic that's genuinely easy to get wrong.
+// CLASS_SCHEDULE.nextClassDate (src/config/assessment.ts) is a fixed,
+// manually-set date (currently 2026-08-16) — deliberately NOT computed from
+// "today". If you change that config value, update the expected UTC
+// timestamps below to match.
 
 function mockNow(isoUtc: string) {
   vi.setSystemTime(new Date(isoUtc));
@@ -24,42 +24,28 @@ describe("getNextClassOccurrence", () => {
     vi.useRealTimers();
   });
 
-  it("finds the upcoming Saturday from a weekday, during EST (winter, UTC-5)", () => {
-    // Monday 2026-03-02 — before that year's DST start (2nd Sunday of March = 2026-03-08).
-    mockNow("2026-03-02T15:00:00Z");
+  it("returns the fixed configured date converted to UTC (EDT, since August is within DST)", () => {
+    mockNow("2026-07-28T12:00:00Z");
     const { start, end } = getNextClassOccurrence();
-    // Expect Saturday 2026-03-07, 9:00 AM EST == 14:00 UTC.
-    expect(start.toISOString()).toBe("2026-03-07T14:00:00.000Z");
-    expect(end.toISOString()).toBe("2026-03-07T16:00:00.000Z");
+    // 2026-08-16, 9:00-11:00 AM EDT (UTC-4) == 13:00-15:00 UTC.
+    expect(start.toISOString()).toBe("2026-08-16T13:00:00.000Z");
+    expect(end.toISOString()).toBe("2026-08-16T15:00:00.000Z");
   });
 
-  it("finds the upcoming Saturday from a weekday, during EDT (summer, UTC-4)", () => {
-    // Wednesday 2026-07-01 — clearly within DST.
-    mockNow("2026-07-01T15:00:00Z");
-    const { start } = getNextClassOccurrence();
-    // Expect Saturday 2026-07-04, 9:00 AM EDT == 13:00 UTC.
-    expect(start.toISOString()).toBe("2026-07-04T13:00:00.000Z");
-  });
-
-  it("stays on the same Saturday if it's Saturday and class hasn't started yet", () => {
-    // Saturday 2026-07-04, 08:00 EDT == 12:00 UTC (one hour before the 9 AM start).
-    mockNow("2026-07-04T12:00:00Z");
-    const { start } = getNextClassOccurrence();
-    expect(start.toISOString()).toBe("2026-07-04T13:00:00.000Z");
-  });
-
-  it("rolls over to next Saturday if it's Saturday and class has already started", () => {
-    // Saturday 2026-07-04, 10:00 EDT == 14:00 UTC (an hour after the 9 AM start).
-    mockNow("2026-07-04T14:00:00Z");
-    const { start } = getNextClassOccurrence();
-    expect(start.toISOString()).toBe("2026-07-11T13:00:00.000Z");
+  it("does not change based on the current date — this is the whole point of not auto-generating it", () => {
+    mockNow("2026-01-01T00:00:00Z");
+    const resultA = getNextClassOccurrence();
+    mockNow("2026-12-31T23:59:00Z");
+    const resultB = getNextClassOccurrence();
+    expect(resultA.start.toISOString()).toBe(resultB.start.toISOString());
+    expect(resultA.start.toISOString()).toBe("2026-08-16T13:00:00.000Z");
   });
 });
 
 describe("formatClassDateLabel / formatClassTimeLabel", () => {
   it("formats a date as a full weekday + month + day", () => {
-    // 2026-07-04T13:00:00Z is 9 AM EDT on a Saturday.
-    expect(formatClassDateLabel(new Date("2026-07-04T13:00:00Z"))).toBe("Saturday, July 4");
+    // 2026-08-16T13:00:00Z is 9 AM EDT — a Sunday.
+    expect(formatClassDateLabel(new Date("2026-08-16T13:00:00Z"))).toBe("Sunday, August 16");
   });
 
   it("formats the fixed class time window, omitting :00 minutes", () => {

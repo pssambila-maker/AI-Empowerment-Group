@@ -151,13 +151,13 @@ export const SCORE_BANDS: ScoreBand[] = [
 ];
 
 /**
- * Recurring free class schedule.
- * Edit this block to change the day, time, timezone, or join link
- * shown on the results screen and sent in the invite email.
+ * Next free class schedule — a single, manually-set date, NOT auto-computed
+ * from "today". Update `nextClassDate` here every time a new class is
+ * scheduled; the site will keep showing this exact date until you change it.
  */
 export const CLASS_SCHEDULE = {
-  /** 0 = Sunday … 6 = Saturday */
-  dayOfWeek: 6,
+  /** The next scheduled class. Update this manually before/after each session. */
+  nextClassDate: { year: 2026, month: 8, day: 16 },
   startHour: 9,
   startMinute: 0,
   endHour: 11,

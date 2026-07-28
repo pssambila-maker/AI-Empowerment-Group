@@ -11,10 +11,6 @@ export interface ClassOccurrence {
   end: Date;
 }
 
-const WEEKDAY_INDEX: Record<string, number> = {
-  Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
-};
-
 /** Returns the UTC ms offset added to an Eastern wall-clock time to get UTC (300 = EST, 240 = EDT). */
 function getEasternUtcOffsetMinutes(year: number, month1to12: number, day: number): number {
   const dstStart = nthSundayUtc(year, 3, 2);  // 2nd Sunday in March
@@ -32,59 +28,20 @@ function nthSundayUtc(year: number, month1to12: number, n: number): number {
   return Date.UTC(year, month1to12 - 1, day);
 }
 
-/** Reads the current date/time as seen in the configured class timezone. */
-function getNowInClassTimezone(): { year: number; month: number; day: number; weekday: number; hour: number; minute: number } {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: CLASS_SCHEDULE.timezone,
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    weekday: "short",
-    hour12: false,
-  }).formatToParts(new Date());
-
-  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
-
-  return {
-    year: Number(get("year")),
-    month: Number(get("month")),
-    day: Number(get("day")),
-    weekday: WEEKDAY_INDEX[get("weekday")] ?? 0,
-    hour: Number(get("hour")) % 24,
-    minute: Number(get("minute")),
-  };
-}
-
-/** Computes the start/end (as UTC Date objects) of the next occurrence of the recurring class. */
+/**
+ * Computes the start/end (as UTC Date objects) of the next class, using the
+ * fixed `CLASS_SCHEDULE.nextClassDate` — NOT computed from "today". Update
+ * that config value when a new class is scheduled.
+ */
 export function getNextClassOccurrence(): ClassOccurrence {
-  const now = getNowInClassTimezone();
-
-  let daysUntil = (CLASS_SCHEDULE.dayOfWeek - now.weekday + 7) % 7;
-
-  // If the class is today but has already started, jump to next week's session.
-  if (daysUntil === 0) {
-    const nowMinutes = now.hour * 60 + now.minute;
-    const startMinutes = CLASS_SCHEDULE.startHour * 60 + CLASS_SCHEDULE.startMinute;
-    if (nowMinutes >= startMinutes) {
-      daysUntil = 7;
-    }
-  }
-
-  const baseUtc = Date.UTC(now.year, now.month - 1, now.day) + daysUntil * 86_400_000;
-  const target = new Date(baseUtc);
-  const targetYear = target.getUTCFullYear();
-  const targetMonth = target.getUTCMonth() + 1;
-  const targetDay = target.getUTCDate();
-
-  const offsetMinutes = getEasternUtcOffsetMinutes(targetYear, targetMonth, targetDay);
+  const { year, month, day } = CLASS_SCHEDULE.nextClassDate;
+  const offsetMinutes = getEasternUtcOffsetMinutes(year, month, day);
 
   const startUtcMs =
-    Date.UTC(targetYear, targetMonth - 1, targetDay, CLASS_SCHEDULE.startHour, CLASS_SCHEDULE.startMinute) +
+    Date.UTC(year, month - 1, day, CLASS_SCHEDULE.startHour, CLASS_SCHEDULE.startMinute) +
     offsetMinutes * 60_000;
   const endUtcMs =
-    Date.UTC(targetYear, targetMonth - 1, targetDay, CLASS_SCHEDULE.endHour, CLASS_SCHEDULE.endMinute) +
+    Date.UTC(year, month - 1, day, CLASS_SCHEDULE.endHour, CLASS_SCHEDULE.endMinute) +
     offsetMinutes * 60_000;
 
   return { start: new Date(startUtcMs), end: new Date(endUtcMs) };

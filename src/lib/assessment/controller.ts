@@ -104,6 +104,18 @@ function wireGateway() {
 function selectRole(role: AssessmentRole) {
   state.role = role;
   applyRoleBranding();
+
+  // Already signed in — most commonly someone retaking the assessment
+  // (e.g. via the "Retake Assessment" button) within the same session that
+  // just verified their email. Skip straight to the profile form instead of
+  // making them click a fresh sign-in link for an email they've already
+  // confirmed.
+  const existingEmail = getFirebaseAuth().currentUser?.email;
+  if (existingEmail) {
+    onSignedIn(existingEmail, role);
+    return;
+  }
+
   showSection("assessment-email-gate");
 }
 
