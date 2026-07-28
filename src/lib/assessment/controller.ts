@@ -97,11 +97,11 @@ export function initAssessment(): void {
 // ── Step 0: Gateway ──────────────────────────────────────────────
 
 function wireGateway() {
-  $("gateway-individual").addEventListener("click", () => selectRole("individual"));
-  $("gateway-enterprise").addEventListener("click", () => selectRole("enterprise"));
+  $("gateway-individual").addEventListener("click", () => void selectRole("individual"));
+  $("gateway-enterprise").addEventListener("click", () => void selectRole("enterprise"));
 }
 
-function selectRole(role: AssessmentRole) {
+async function selectRole(role: AssessmentRole) {
   state.role = role;
   applyRoleBranding();
 
@@ -110,7 +110,16 @@ function selectRole(role: AssessmentRole) {
   // just verified their email. Skip straight to the profile form instead of
   // making them click a fresh sign-in link for an email they've already
   // confirmed.
-  const existingEmail = getFirebaseAuth().currentUser?.email;
+  //
+  // authStateReady() is required, not optional: Firebase restores a
+  // persisted session from IndexedDB asynchronously on every page load
+  // (~tens of ms), so currentUser can read null for a brief window even
+  // when the user is genuinely signed in. Reading currentUser without
+  // waiting for this is a real, reproducible race — a click that lands in
+  // that window would silently fall back to showing the email gate again.
+  const auth = getFirebaseAuth();
+  await auth.authStateReady();
+  const existingEmail = auth.currentUser?.email;
   if (existingEmail) {
     onSignedIn(existingEmail, role);
     return;
