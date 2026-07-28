@@ -75,6 +75,7 @@ ai-empowerment-group/
 │   ├── lib/
 │   │   ├── firebase/client.ts    # Shared Firebase app/auth/db/functions init
 │   │   ├── assessment/           # Scoring, calendar, email templates, leads, mail, auth
+│   │   │                         # (scoring.ts, calendar.ts, emailTemplates.ts have *.test.ts alongside)
 │   │   ├── portal/                # Profile upsert, membership check, messaging
 │   │   └── contact/               # Contact form submission
 │   ├── layouts/
@@ -102,10 +103,17 @@ ai-empowerment-group/
 │       └── stripeWebhook.ts         # Syncs membershipStatus from Stripe
 ├── public/
 │   └── images/logo/       # Neural Phoenix assets
+├── e2e/                   # Playwright end-to-end tests (see TESTING.md)
 ├── firestore.rules        # Firestore security rules (deployed via CLI)
+├── firestore.rules.test.ts # Automated tests for the rules above (needs the emulator)
 ├── firebase.json
 ├── .firebaserc
 ├── astro.config.mjs
+├── vitest.config.ts       # Pure unit tests
+├── vitest.rules.config.ts # Firestore rules tests (separate — needs the emulator)
+├── playwright.config.ts
+├── TESTING.md             # What each test layer covers, how to run them
+├── ARCHITECTURE.md        # Module map + troubleshooting playbook + expansion patterns
 └── package.json
 ```
 
@@ -167,6 +175,14 @@ npm run build && firebase deploy --only hosting,firestore:rules,functions
    gate in `/portal` is already enforced — once the webhook starts writing
    `membershipStatus: "paid"`, access unlocks automatically with no further
    code changes.
+
+---
+
+## Testing
+
+Three layers — unit tests (`npm test`), Firestore rules tests (`npm run test:rules`, needs a JDK), and end-to-end tests (`npm run test:e2e`, drives a real browser against a real dev server). See **`TESTING.md`** for what each covers and when to add to which.
+
+For troubleshooting a specific problem or figuring out the right pattern to follow when adding a feature, see **`ARCHITECTURE.md`** — it's a module-by-module map plus a playbook of real issues this project hit (repo/production drift, silently-failing Firestore writes, a `hidden`-attribute CSS gotcha, email deliverability) and how they were actually diagnosed.
 
 ---
 

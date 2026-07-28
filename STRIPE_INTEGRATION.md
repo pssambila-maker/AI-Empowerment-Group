@@ -136,8 +136,8 @@ export const createCheckoutSession = functions.https.onCall(
       mode: "subscription",              // Weekly recurring billing
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: "https://aiempowermentgroup.com/payment-success?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: "https://aiempowermentgroup.com/payment-cancelled",
+      success_url: "https://aiempoweredgroup.com/success?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: "https://aiempoweredgroup.com/payment-cancelled",
       subscription_data: {
         metadata: {
           firebaseUID: context.auth.uid, // Link subscription back to Firebase user

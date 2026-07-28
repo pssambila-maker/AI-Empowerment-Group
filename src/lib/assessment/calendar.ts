@@ -132,7 +132,7 @@ export function buildGoogleCalendarUrl({ start, end }: ClassOccurrence): string 
 
 /** Builds a downloadable .ics file (string content) for the given occurrence. */
 export function buildIcsContent({ start, end }: ClassOccurrence): string {
-  const uid = `${start.getTime()}-ai-empowerment-group@aiempowermentgroup.com`;
+  const uid = `${start.getTime()}-ai-empowerment-group@aiempoweredgroup.com`;
   const dtstamp = toIcsUtc(new Date());
 
   return [

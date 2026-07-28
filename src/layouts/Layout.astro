@@ -46,6 +46,14 @@ const {
 
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+      /* The browser's default [hidden] { display: none } rule loses to any
+         component's own `display` declaration on that same element, since
+         author-origin CSS always outranks the UA stylesheet regardless of
+         specificity. Re-asserting it here with !important guarantees the
+         hidden attribute always actually hides the element, however a
+         component chooses to style it when visible. */
+      [hidden] { display: none !important; }
+
       html { font-size: 16px; scroll-behavior: smooth; }
 
       body {

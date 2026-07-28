@@ -144,7 +144,7 @@ firebase deploy --only hosting
 ### Where to find the preview URL
 
 After running the preview deploy command, Firebase prints a URL like:
-`https://aiempowermentgroup--preview-abc123.web.app`
+`https://ai-empowerment-group--preview-abc123.web.app`
 
 Share this with anyone who needs to review changes before they go live.
 
@@ -181,7 +181,7 @@ Clients type messages in the portal. You receive them and reply. All messages ar
 - Cancel or pause a client's subscription from the Stripe Dashboard if needed
 
 ### As a client, they will be able to:
-- Log in at `aiempowermentgroup.com/login`
+- Log in at `aiempoweredgroup.com/login`
 - Use their email/password or Google account
 - Send and receive messages with you directly in the portal
 

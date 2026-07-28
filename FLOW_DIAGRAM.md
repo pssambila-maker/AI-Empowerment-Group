@@ -6,7 +6,7 @@
 
 ```mermaid
 graph TD
-    A([🌐 aiempowermentgroup.com]) --> B[Homepage /]
+    A([🌐 aiempoweredgroup.com]) --> B[Homepage /]
 
     B --> C[Bio /bio]
     B --> D[Services /services]
@@ -229,7 +229,7 @@ flowchart LR
     F --> G{QA Review}
     G -->|Fail| D
     G -->|Pass| H[firebase deploy --only hosting]
-    H --> I([Live: aiempowermentgroup.com ✓])
+    H --> I([Live: aiempoweredgroup.com ✓])
 
     style I fill:#C9A84C,color:#2D2D2D
     style D fill:#cc3333,color:#fff

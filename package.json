@@ -5,10 +5,20 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.rules.config.ts\"",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "astro": "^4.16.0",
     "firebase": "^10.14.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "@playwright/test": "^1.62.0",
+    "dotenv": "^17.4.2",
+    "vitest": "^4.1.10"
   }
 }
