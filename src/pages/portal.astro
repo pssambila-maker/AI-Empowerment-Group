@@ -18,11 +18,10 @@ import Layout from "../layouts/Layout.astro";
       Start your weekly training subscription to unlock your private<br />
       messaging channel with your consultant.
     </p>
-    <div class="price-badge">$750 <span>/ week</span></div>
     <button id="subscribe-btn" class="btn-primary">
       Start Subscription
     </button>
-    <p class="small-note">Billed weekly via Stripe. Cancel any time.</p>
+    <p class="small-note">Billed via Stripe. Cancel any time.</p>
   </div>
 
   <!-- Subscription lapsed -->
@@ -30,7 +29,7 @@ import Layout from "../layouts/Layout.astro";
     <img src="/images/logo/neural-phoenix.png" alt="AI Empowerment Group" height="72" class="portal-logo" />
     <h2 class="lapsed-heading">Subscription Lapsed</h2>
     <p class="sub-text">Your last payment could not be processed. Reactivate to regain access.</p>
-    <button id="reactivate-btn" class="btn-primary">Reactivate — $750/week</button>
+    <button id="reactivate-btn" class="btn-primary">Reactivate Subscription</button>
     <a href="/contact" class="btn-ghost">Contact Support</a>
   </div>
 
@@ -300,14 +299,6 @@ import Layout from "../layouts/Layout.astro";
     line-height: 1.7;
     max-width: 420px;
   }
-
-  .price-badge {
-    font-family: var(--font-heading);
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--color-off-white);
-  }
-  .price-badge span { font-size: 1rem; color: var(--color-mid-grey); font-weight: 500; }
 
   .btn-primary {
     background: var(--color-gold); color: var(--color-charcoal);
