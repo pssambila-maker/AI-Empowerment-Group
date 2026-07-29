@@ -1,10 +1,28 @@
 // ─────────────────────────────────────────────────────────────────
-// Free-class scheduling helpers — computes the next occurrence of the
-// recurring class (see src/config/assessment.ts -> CLASS_SCHEDULE) and
-// builds Google Calendar / .ics links for it.
+// Free-class scheduling helpers — computes the occurrence of the
+// configured class and builds Google Calendar / .ics links for it.
+//
+// Pure functions: the schedule is passed in as data (see ClassSchedule
+// below), not imported from a constant — the real schedule lives in
+// Firestore (src/lib/assessment/classSchedule.ts), editable from /admin.
 // ─────────────────────────────────────────────────────────────────
 
-import { CLASS_SCHEDULE } from "../../config/assessment";
+export interface ClassSchedule {
+  year: number;
+  month: number;
+  day: number;
+  startHour: number;
+  startMinute: number;
+  endHour: number;
+  endMinute: number;
+  /** IANA timezone used for offset calculation (handles EST/EDT). */
+  timezone: string;
+  timezoneLabel: string;
+  title: string;
+  description: string;
+  location: string;
+  joinLink: string;
+}
 
 export interface ClassOccurrence {
   start: Date;
@@ -29,28 +47,26 @@ function nthSundayUtc(year: number, month1to12: number, n: number): number {
 }
 
 /**
- * Computes the start/end (as UTC Date objects) of the next class, using the
- * fixed `CLASS_SCHEDULE.nextClassDate` — NOT computed from "today". Update
- * that config value when a new class is scheduled.
+ * Computes the start/end (as UTC Date objects) of the configured class date —
+ * NOT computed from "today". `schedule` normally comes from Firestore (see
+ * classSchedule.ts), letting this stay a pure, easily-tested function.
  */
-export function getNextClassOccurrence(): ClassOccurrence {
-  const { year, month, day } = CLASS_SCHEDULE.nextClassDate;
+export function getNextClassOccurrence(schedule: ClassSchedule): ClassOccurrence {
+  const { year, month, day } = schedule;
   const offsetMinutes = getEasternUtcOffsetMinutes(year, month, day);
 
   const startUtcMs =
-    Date.UTC(year, month - 1, day, CLASS_SCHEDULE.startHour, CLASS_SCHEDULE.startMinute) +
-    offsetMinutes * 60_000;
+    Date.UTC(year, month - 1, day, schedule.startHour, schedule.startMinute) + offsetMinutes * 60_000;
   const endUtcMs =
-    Date.UTC(year, month - 1, day, CLASS_SCHEDULE.endHour, CLASS_SCHEDULE.endMinute) +
-    offsetMinutes * 60_000;
+    Date.UTC(year, month - 1, day, schedule.endHour, schedule.endMinute) + offsetMinutes * 60_000;
 
   return { start: new Date(startUtcMs), end: new Date(endUtcMs) };
 }
 
 /** e.g. "Saturday, June 14" — formatted in the class's timezone. */
-export function formatClassDateLabel(date: Date): string {
+export function formatClassDateLabel(date: Date, schedule: ClassSchedule): string {
   return new Intl.DateTimeFormat("en-US", {
-    timeZone: CLASS_SCHEDULE.timezone,
+    timeZone: schedule.timezone,
     weekday: "long",
     month: "long",
     day: "numeric",
@@ -64,11 +80,11 @@ function formatHour(hour: number, minute: number): string {
   return `${h12}${mm} ${ampm}`;
 }
 
-/** e.g. "9:00 AM - 11:00 AM ET" — built from CLASS_SCHEDULE, timezone-agnostic of "now". */
-export function formatClassTimeLabel(): string {
-  const start = formatHour(CLASS_SCHEDULE.startHour, CLASS_SCHEDULE.startMinute);
-  const end = formatHour(CLASS_SCHEDULE.endHour, CLASS_SCHEDULE.endMinute);
-  return `${start} - ${end} ${CLASS_SCHEDULE.timezoneLabel}`;
+/** e.g. "9:00 AM - 11:00 AM ET" — built from the schedule, timezone-agnostic of "now". */
+export function formatClassTimeLabel(schedule: ClassSchedule): string {
+  const start = formatHour(schedule.startHour, schedule.startMinute);
+  const end = formatHour(schedule.endHour, schedule.endMinute);
+  return `${start} - ${end} ${schedule.timezoneLabel}`;
 }
 
 function toIcsUtc(date: Date): string {
@@ -76,19 +92,19 @@ function toIcsUtc(date: Date): string {
 }
 
 /** Builds a "Add to Google Calendar" link for the given occurrence. */
-export function buildGoogleCalendarUrl({ start, end }: ClassOccurrence): string {
+export function buildGoogleCalendarUrl({ start, end }: ClassOccurrence, schedule: ClassSchedule): string {
   const params = new URLSearchParams({
     action: "TEMPLATE",
-    text: CLASS_SCHEDULE.title,
+    text: schedule.title,
     dates: `${toIcsUtc(start)}/${toIcsUtc(end)}`,
-    details: `${CLASS_SCHEDULE.description}\n\nJoin link: ${CLASS_SCHEDULE.joinLink}`,
-    location: CLASS_SCHEDULE.location,
+    details: `${schedule.description}\n\nJoin link: ${schedule.joinLink}`,
+    location: schedule.location,
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
 /** Builds a downloadable .ics file (string content) for the given occurrence. */
-export function buildIcsContent({ start, end }: ClassOccurrence): string {
+export function buildIcsContent({ start, end }: ClassOccurrence, schedule: ClassSchedule): string {
   const uid = `${start.getTime()}-ai-empowerment-group@aiempoweredgroup.com`;
   const dtstamp = toIcsUtc(new Date());
 
@@ -102,10 +118,10 @@ export function buildIcsContent({ start, end }: ClassOccurrence): string {
     `DTSTAMP:${dtstamp}`,
     `DTSTART:${toIcsUtc(start)}`,
     `DTEND:${toIcsUtc(end)}`,
-    `SUMMARY:${CLASS_SCHEDULE.title}`,
-    `DESCRIPTION:${CLASS_SCHEDULE.description}\\n\\nJoin link: ${CLASS_SCHEDULE.joinLink}`,
-    `LOCATION:${CLASS_SCHEDULE.location}`,
-    `URL:${CLASS_SCHEDULE.joinLink}`,
+    `SUMMARY:${schedule.title}`,
+    `DESCRIPTION:${schedule.description}\\n\\nJoin link: ${schedule.joinLink}`,
+    `LOCATION:${schedule.location}`,
+    `URL:${schedule.joinLink}`,
     "END:VEVENT",
     "END:VCALENDAR",
   ].join("\r\n");

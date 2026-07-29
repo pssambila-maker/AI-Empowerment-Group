@@ -25,7 +25,10 @@ import {
   formatClassDateLabel,
   formatClassTimeLabel,
   getNextClassOccurrence,
+  type ClassOccurrence,
+  type ClassSchedule,
 } from "./calendar";
+import { fetchClassSchedule } from "./classSchedule";
 
 type SectionId =
   | "assessment-gateway"
@@ -334,8 +337,10 @@ function wireQuestionFlow() {
       state.currentChoiceIndex += 1;
       renderChoiceQuestion();
     } else {
-      renderResults();
-      showSection("assessment-results");
+      void (async () => {
+        await renderResults();
+        showSection("assessment-results");
+      })();
     }
   });
 }
@@ -397,7 +402,7 @@ function renderChoiceQuestion() {
 
 // ── Step 4: Results ───────────────────────────────────────────────
 
-function renderResults() {
+async function renderResults() {
   const { score, band } = calculateScore({
     checkedIndexes: state.checkedIndexes,
     choiceAnswers: state.choiceAnswers,
@@ -422,21 +427,36 @@ function renderResults() {
   $("class-registered").hidden = true;
   $("register-status").textContent = "";
 
-  const occurrence = getNextClassOccurrence();
-  const scheduleText = `${formatClassDateLabel(occurrence.start)} • ${formatClassTimeLabel()}`;
-  $("class-schedule-display").textContent = scheduleText;
-  $("registered-schedule-display").textContent = scheduleText;
+  if (leadDb) {
+    const schedule = await getClassSchedule(leadDb);
+    const occurrence = getNextClassOccurrence(schedule);
+    const scheduleText = `${formatClassDateLabel(occurrence.start, schedule)} • ${formatClassTimeLabel(schedule)}`;
+    $("class-schedule-display").textContent = scheduleText;
+    $("registered-schedule-display").textContent = scheduleText;
 
-  const icsLink = document.getElementById("download-ics-btn") as HTMLButtonElement;
-  icsLink.onclick = () => downloadIcs();
+    const icsLink = document.getElementById("download-ics-btn") as HTMLButtonElement;
+    icsLink.onclick = () => downloadIcs(occurrence, schedule);
 
-  (document.getElementById("add-google-calendar-link") as HTMLAnchorElement).href = buildGoogleCalendarUrl(occurrence);
+    (document.getElementById("add-google-calendar-link") as HTMLAnchorElement).href = buildGoogleCalendarUrl(
+      occurrence,
+      schedule,
+    );
+  }
 
   // Persist the lead now that we have a score (fire-and-forget).
   void persistLead(score, band.category);
 }
 
 let leadDb: ReturnType<typeof getFirebaseDb> | null = null;
+
+// Fetched once per page load and cached — the schedule rarely changes
+// mid-session, and this avoids a redundant Firestore read every time it's needed.
+let classSchedulePromise: Promise<ClassSchedule> | null = null;
+
+function getClassSchedule(db: ReturnType<typeof getFirebaseDb>): Promise<ClassSchedule> {
+  if (!classSchedulePromise) classSchedulePromise = fetchClassSchedule(db);
+  return classSchedulePromise;
+}
 
 async function persistLead(score: number, category: ScoreCategory) {
   if (!leadDb) return;
@@ -461,9 +481,8 @@ async function persistLead(score: number, category: ScoreCategory) {
   }
 }
 
-function downloadIcs() {
-  const occurrence = getNextClassOccurrence();
-  const ics = buildIcsContent(occurrence);
+function downloadIcs(occurrence: ClassOccurrence, schedule: ClassSchedule) {
+  const ics = buildIcsContent(occurrence, schedule);
   const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
   const url = URL.createObjectURL(blob);
 
@@ -478,6 +497,7 @@ function downloadIcs() {
 
 function wireResults(db: ReturnType<typeof getFirebaseDb>) {
   leadDb = db;
+  void getClassSchedule(db); // warm the cache early — plenty of time before results render
 
   $("register-class-btn").addEventListener("click", () => void handleRegisterForClass(db));
   $("restart-btn").addEventListener("click", restartAssessment);
@@ -491,7 +511,8 @@ async function handleRegisterForClass(db: ReturnType<typeof getFirebaseDb>) {
   btn.textContent = "Registering…";
 
   try {
-    await sendClassInviteEmail(db, { to: state.email, name: state.fullName, score: state.lastScore });
+    const schedule = await getClassSchedule(db);
+    await sendClassInviteEmail(db, { to: state.email, name: state.fullName, score: state.lastScore, schedule });
 
     // Best-effort — a clean, dedicated record of who registered (separate
     // from `mail`, which is just the outgoing-email queue). A failure here
@@ -504,7 +525,7 @@ async function handleRegisterForClass(db: ReturnType<typeof getFirebaseDb>) {
         fullName: state.fullName,
         score: state.lastScore,
         role: state.role,
-        classDate: getNextClassOccurrence().start.toISOString(),
+        classDate: getNextClassOccurrence(schedule).start.toISOString(),
       });
     }
 

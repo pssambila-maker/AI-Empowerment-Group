@@ -6,13 +6,13 @@
 // Edit the copy here without touching any sending/UI logic.
 // ─────────────────────────────────────────────────────────────────
 
-import { CLASS_SCHEDULE } from "../../config/assessment";
-import { formatClassDateLabel, formatClassTimeLabel, type ClassOccurrence } from "./calendar";
+import { formatClassDateLabel, formatClassTimeLabel, type ClassOccurrence, type ClassSchedule } from "./calendar";
 
 export interface ClassInviteEmailInput {
   name: string;
   score: number;
   occurrence: ClassOccurrence;
+  schedule: ClassSchedule;
 }
 
 export interface EmailContent {
@@ -21,9 +21,9 @@ export interface EmailContent {
   html: string;
 }
 
-export function buildClassInviteEmail({ name, score, occurrence }: ClassInviteEmailInput): EmailContent {
-  const dateLabel = formatClassDateLabel(occurrence.start);
-  const timeLabel = formatClassTimeLabel();
+export function buildClassInviteEmail({ name, score, occurrence, schedule }: ClassInviteEmailInput): EmailContent {
+  const dateLabel = formatClassDateLabel(occurrence.start, schedule);
+  const timeLabel = formatClassTimeLabel(schedule);
   const firstName = name.trim().split(/\s+/)[0] || "there";
 
   const subject = "Your AI Readiness Score + Your Free Class Invite";
@@ -34,7 +34,7 @@ export function buildClassInviteEmail({ name, score, occurrence }: ClassInviteEm
     `As a next step, we'd love to have you join our free AI class, where we cover practical, beginner-friendly skills you can start using right away.\n\n` +
     `Date: ${dateLabel}\n` +
     `Time: ${timeLabel}\n` +
-    `Join link: ${CLASS_SCHEDULE.joinLink}\n\n` +
+    `Join link: ${schedule.joinLink}\n\n` +
     `Add it to your calendar now so you don't miss it - we'll also send a reminder before the session starts.\n\n` +
     `Looking forward to seeing you there!\n\n` +
     `Warm regards,\n` +
@@ -63,7 +63,7 @@ export function buildClassInviteEmail({ name, score, occurrence }: ClassInviteEm
         <tr>
           <td style="padding: 4px 12px 4px 0; font-weight: 700;">Join link:</td>
           <td style="padding: 4px 0;">
-            <a href="${CLASS_SCHEDULE.joinLink}" style="color: #C9A84C;">${escapeHtml(CLASS_SCHEDULE.joinLink)}</a>
+            <a href="${schedule.joinLink}" style="color: #C9A84C;">${escapeHtml(schedule.joinLink)}</a>
           </td>
         </tr>
       </table>

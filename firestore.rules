@@ -10,6 +10,15 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.email == 'eus.java@gmail.com';
     }
 
+    // Site-wide settings editable from /admin without a redeploy — currently
+    // just config/classSchedule (the recurring free class's date/time/join
+    // link). Any signed-in user can read it (the assessment funnel always
+    // requires sign-in before it's needed); only the admin can write it.
+    match /config/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
     // Assessment results — created once by the signed-in user who completed
     // the assessment. No client update/delete; read is admin-only (the
     // /admin page), everyone else gets nothing back.

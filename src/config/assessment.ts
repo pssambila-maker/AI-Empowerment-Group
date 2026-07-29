@@ -151,13 +151,16 @@ export const SCORE_BANDS: ScoreBand[] = [
 ];
 
 /**
- * Next free class schedule — a single, manually-set date, NOT auto-computed
- * from "today". Update `nextClassDate` here every time a new class is
- * scheduled; the site will keep showing this exact date until you change it.
+ * Default/fallback free-class schedule. The real, current schedule lives in
+ * Firestore (config/classSchedule — see src/lib/assessment/classSchedule.ts)
+ * so it can be updated from /admin without a code change or redeploy. This
+ * constant is only used as a seed value the first time the app runs before
+ * that Firestore document has ever been saved.
  */
-export const CLASS_SCHEDULE = {
-  /** The next scheduled class. Update this manually before/after each session. */
-  nextClassDate: { year: 2026, month: 8, day: 16 },
+export const DEFAULT_CLASS_SCHEDULE = {
+  year: 2026,
+  month: 8,
+  day: 16,
   startHour: 9,
   startMinute: 0,
   endHour: 11,

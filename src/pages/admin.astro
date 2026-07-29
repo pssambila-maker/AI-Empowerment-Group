@@ -22,6 +22,31 @@ import Layout from "../layouts/Layout.astro";
     </header>
 
     <section class="admin-section">
+      <h2>Free Class Schedule</h2>
+      <form id="schedule-form" class="schedule-form">
+        <div class="field-group">
+          <label for="schedule-date">Date</label>
+          <input type="date" id="schedule-date" required />
+        </div>
+        <div class="field-group">
+          <label for="schedule-start">Start time</label>
+          <input type="time" id="schedule-start" required />
+        </div>
+        <div class="field-group">
+          <label for="schedule-end">End time</label>
+          <input type="time" id="schedule-end" required />
+        </div>
+        <div class="field-group field-group--wide">
+          <label for="schedule-link">Join link</label>
+          <input type="url" id="schedule-link" placeholder="https://zoom.us/..." required />
+        </div>
+        <button type="submit" id="schedule-save-btn" class="csv-btn schedule-save-btn">Save</button>
+        <span id="schedule-status" class="schedule-status" aria-live="polite"></span>
+      </form>
+      <p class="empty-note">Times are Eastern (ET) — this is what the assessment funnel and class-invite emails show. Editing this here takes effect immediately, no redeploy needed.</p>
+    </section>
+
+    <section class="admin-section">
       <h2>
         Assessment Leads <span id="leads-count" class="count-badge"></span>
         <button type="button" id="leads-csv-btn" class="csv-btn">Download CSV</button>
@@ -85,6 +110,8 @@ import Layout from "../layouts/Layout.astro";
   } from "../lib/admin/data";
   import { toCsv } from "../lib/admin/csv";
   import { ADMIN_EMAIL } from "../config/admin";
+  import { fetchClassSchedule, saveClassSchedule } from "../lib/assessment/classSchedule";
+  import type { ClassSchedule } from "../lib/assessment/calendar";
 
   const auth = getFirebaseAuth();
   const db = getFirebaseDb();
@@ -163,7 +190,66 @@ import Layout from "../layouts/Layout.astro";
     (document.getElementById("inquiries-empty") as HTMLElement).hidden = inquiries.length > 0;
   }
 
-  document.getElementById("refresh-btn")?.addEventListener("click", () => void loadData());
+  let currentSchedule: ClassSchedule | null = null;
+
+  function pad(n: number): string {
+    return String(n).padStart(2, "0");
+  }
+
+  async function loadSchedule() {
+    currentSchedule = await fetchClassSchedule(db);
+    const s = currentSchedule;
+    (document.getElementById("schedule-date") as HTMLInputElement).value =
+      `${s.year}-${pad(s.month)}-${pad(s.day)}`;
+    (document.getElementById("schedule-start") as HTMLInputElement).value = `${pad(s.startHour)}:${pad(s.startMinute)}`;
+    (document.getElementById("schedule-end") as HTMLInputElement).value = `${pad(s.endHour)}:${pad(s.endMinute)}`;
+    (document.getElementById("schedule-link") as HTMLInputElement).value = s.joinLink;
+  }
+
+  document.getElementById("schedule-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!currentSchedule) return;
+
+    const dateVal = (document.getElementById("schedule-date") as HTMLInputElement).value;
+    const startVal = (document.getElementById("schedule-start") as HTMLInputElement).value;
+    const endVal = (document.getElementById("schedule-end") as HTMLInputElement).value;
+    const linkVal = (document.getElementById("schedule-link") as HTMLInputElement).value.trim();
+
+    const [year, month, day] = dateVal.split("-").map(Number);
+    const [startHour, startMinute] = startVal.split(":").map(Number);
+    const [endHour, endMinute] = endVal.split(":").map(Number);
+
+    const updated: ClassSchedule = {
+      ...currentSchedule, // preserves timezone/timezoneLabel/title/description/location
+      year, month, day,
+      startHour, startMinute,
+      endHour, endMinute,
+      joinLink: linkVal,
+    };
+
+    const btn = document.getElementById("schedule-save-btn") as HTMLButtonElement;
+    const status = document.getElementById("schedule-status") as HTMLElement;
+    btn.disabled = true;
+    status.textContent = "";
+
+    try {
+      await saveClassSchedule(db, updated);
+      currentSchedule = updated;
+      status.textContent = "Saved.";
+      status.style.color = "var(--color-success, #2D7D32)";
+    } catch (err) {
+      console.error("Failed to save class schedule:", err);
+      status.textContent = "Failed to save — check the console.";
+      status.style.color = "var(--color-error, #CC3333)";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById("refresh-btn")?.addEventListener("click", () => {
+    void loadData();
+    void loadSchedule();
+  });
 
   document.getElementById("leads-csv-btn")?.addEventListener("click", () => {
     const csv = toCsv(latestLeads, [
@@ -213,7 +299,7 @@ import Layout from "../layouts/Layout.astro";
     }
     show("admin");
     try {
-      await loadData();
+      await Promise.all([loadData(), loadSchedule()]);
     } catch (err) {
       console.error("Failed to load admin data:", err);
     }
@@ -346,4 +432,56 @@ import Layout from "../layouts/Layout.astro";
   tbody tr:hover { background: rgba(245,245,240,0.02); }
 
   .empty-note { padding: 1.25rem; color: var(--color-mid-grey); font-size: 0.875rem; }
+
+  .schedule-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+    background: #1e1e1e;
+    border: 1px solid rgba(245,245,240,0.08);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+
+  .schedule-form .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .schedule-form .field-group--wide { flex: 1; min-width: 14rem; }
+
+  .schedule-form label {
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-mid-grey);
+  }
+
+  .schedule-form input {
+    background: var(--color-charcoal);
+    border: 1.5px solid rgba(245,245,240,0.12);
+    border-radius: 4px;
+    color: var(--color-off-white);
+    font-size: 0.9375rem;
+    padding: 0.55rem 0.75rem;
+  }
+
+  .schedule-form input:focus {
+    outline: none;
+    border-color: var(--color-gold);
+  }
+
+  .schedule-save-btn {
+    margin-left: 0;
+    height: 2.4rem;
+  }
+
+  .schedule-status {
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
 </style>

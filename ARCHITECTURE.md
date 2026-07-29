@@ -10,7 +10,7 @@ This is the deep-dive companion to `README.md`. Read `README.md` first for the s
 |---|---|
 | An assessment question, its points, or the score-band insights/labels | `src/config/assessment.ts` only |
 | How the score is calculated | `src/lib/assessment/scoring.ts` |
-| The recurring class's day/time/join link | `src/config/assessment.ts`'s `CLASS_SCHEDULE` |
+| The recurring class's day/time/join link (no redeploy needed — edit via `/admin`, or Firebase Console → Firestore → `config/classSchedule`) | `src/lib/assessment/classSchedule.ts` (fetch/save), `src/pages/admin.astro`'s "Free Class Schedule" form. `src/config/assessment.ts`'s `DEFAULT_CLASS_SCHEDULE` is only the fallback used before the Firestore doc exists |
 | The class-invite email's copy | `src/lib/assessment/emailTemplates.ts` |
 | Who's registered for the class, taken the assessment, or sent an inquiry | `/admin` page (owner-only — see below), or Firebase Console → Firestore → `leads`/`classRegistrations`/`contactSubmissions` collections directly |
 | Who's registered for the class (code) | `src/lib/assessment/registrations.ts` |
@@ -86,6 +86,17 @@ Run all three test layers (`npm test && npm run test:rules && npm run test:e2e` 
 3. Put the read/write logic in its own `src/lib/<feature>/` module (see the pattern in `lib/assessment/`, `lib/portal/`, `lib/contact/`) — not inline in a page's `<script>` block.
 4. Run `npm run test:rules` before deploying the rules, and actually deploy the rules (`firebase deploy --only firestore:rules`) — don't assume writing the file is enough. This project's contact form and portal both had *correct* rules sitting undeployed for a real stretch of time.
 
+### Making a hardcoded config value editable without a redeploy
+
+The class schedule (`config/classSchedule`) is the template for this. Pattern:
+
+1. Keep the old TS constant as a `DEFAULT_*` fallback (used only if the Firestore doc doesn't exist yet) — don't delete it, since it's also what seeds the shape/defaults.
+2. Add a `fetchX`/`saveX` pair in `src/lib/<feature>/` that reads/writes a single `config/{docId}` Firestore document, falling back field-by-field to the default constant.
+3. Thread the fetched value through as an explicit function parameter everywhere it's consumed (see `calendar.ts`'s `ClassSchedule` parameter) rather than importing the constant — this is what makes it swappable at runtime instead of baked in at build time.
+4. Add a `config/{docId}` rule: readable by any signed-in user (or public, if the feature needs it), writable only by `isAdmin()`. All such settings share one `config/{docId}` match block in `firestore.rules` — add a new doc ID, don't add a new top-level collection per setting.
+5. Add an edit form to `/admin` that calls `saveX` — the admin page already establishes the "owner-only" pattern, so new settings should live there rather than growing a second privileged surface.
+6. Cache the fetch per page load (see `controller.ts`'s `getClassSchedule` promise cache) so multiple consumers on the same page don't each issue their own Firestore read.
+
 ### Adding a new funnel step (assessment-style, multi-screen flow)
 
 Follow the assessment funnel's exact pattern: one `.astro` component per screen in `components/<feature>/`, all screens rendered into the page with `hidden` on all but the first, a single `controller.ts` managing a `state` object and a `showSection(id)` helper that sets `hidden` on every screen except the target. Keep config (copy, scoring, schedules — anything a non-engineer might reasonably want to tweak) in a dedicated `config/<feature>.ts`, separate from the logic that consumes it.
@@ -100,4 +111,4 @@ Also: if you're building a server-side alternative to something that already has
 
 ## 4. Current deployment state (check before assuming)
 
-As of this writing: `hosting` and `firestore.rules` are deployed and match this repo. **`functions/` is not deployed** — none of `verifySubscription`, `submitContactFormFn`, `createCheckoutSession`, `stripeWebhook` are live, because Stripe secrets (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) haven't been set in this Firebase project yet, and Firebase's codebase-wide analysis step means *no* function in this codebase can deploy until they are (see §3 above). This state can and will go stale — don't trust this paragraph, run `firebase functions:list` against the real project to check current reality.
+As of this writing: `hosting` and `firestore.rules` are deployed and match this repo, **except** the `config/{docId}` block backing the Firestore-based class schedule — that rule (and the hosting changes that depend on it) exist locally but haven't been deployed yet. Until `firebase deploy` runs, the `/admin` schedule form and the assessment funnel's schedule fetch will get `permission-denied` in production (this was confirmed empirically against the real project, not assumed) and silently fall back to `DEFAULT_CLASS_SCHEDULE`. **`functions/` is not deployed** — none of `verifySubscription`, `submitContactFormFn`, `createCheckoutSession`, `stripeWebhook` are live, because Stripe secrets (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) haven't been set in this Firebase project yet, and Firebase's codebase-wide analysis step means *no* function in this codebase can deploy until they are (see §3 above). This state can and will go stale — don't trust this paragraph, run `firebase functions:list` against the real project to check current reality.

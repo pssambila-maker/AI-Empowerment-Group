@@ -288,6 +288,40 @@ describe("contactSubmissions/{submissionId}", () => {
   });
 });
 
+describe("config/{docId} (site settings editable from /admin)", () => {
+  const ADMIN_EMAIL = "eus.java@gmail.com";
+  const scheduleDoc = {
+    year: 2026, month: 8, day: 16,
+    startHour: 9, startMinute: 0, endHour: 11, endMinute: 0,
+    timezone: "America/New_York", timezoneLabel: "ET",
+    title: "Free AI Class", description: "Test", location: "Zoom",
+    joinLink: "https://zoom.us/test",
+  };
+
+  it("denies an unauthenticated read", async () => {
+    const db = testEnv.unauthenticatedContext().firestore();
+    await assertFails(getDoc(doc(db, "config", "classSchedule")));
+  });
+
+  it("allows any authenticated user to read", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "config", "classSchedule"), scheduleDoc);
+    });
+    const db = testEnv.authenticatedContext("alice").firestore();
+    await assertSucceeds(getDoc(doc(db, "config", "classSchedule")));
+  });
+
+  it("denies a non-admin authenticated user from writing", async () => {
+    const db = testEnv.authenticatedContext("alice", { email: "not-the-admin@example.com" }).firestore();
+    await assertFails(setDoc(doc(db, "config", "classSchedule"), scheduleDoc));
+  });
+
+  it("allows the admin to write", async () => {
+    const db = testEnv.authenticatedContext("owner-uid", { email: ADMIN_EMAIL }).firestore();
+    await assertSucceeds(setDoc(doc(db, "config", "classSchedule"), scheduleDoc));
+  });
+});
+
 describe("admin read access (/admin page)", () => {
   const ADMIN_EMAIL = "eus.java@gmail.com";
 

@@ -10,18 +10,19 @@
 // ─────────────────────────────────────────────────────────────────
 
 import { collection, addDoc, serverTimestamp, type Firestore } from "firebase/firestore";
-import { getNextClassOccurrence } from "./calendar";
+import { getNextClassOccurrence, type ClassSchedule } from "./calendar";
 import { buildClassInviteEmail } from "./emailTemplates";
 
 export interface ClassInviteRequest {
   to: string;
   name: string;
   score: number;
+  schedule: ClassSchedule;
 }
 
-export async function sendClassInviteEmail(db: Firestore, { to, name, score }: ClassInviteRequest): Promise<void> {
-  const occurrence = getNextClassOccurrence();
-  const { subject, text, html } = buildClassInviteEmail({ name, score, occurrence });
+export async function sendClassInviteEmail(db: Firestore, { to, name, score, schedule }: ClassInviteRequest): Promise<void> {
+  const occurrence = getNextClassOccurrence(schedule);
+  const { subject, text, html } = buildClassInviteEmail({ name, score, occurrence, schedule });
 
   await addDoc(collection(db, "mail"), {
     to: [to],
