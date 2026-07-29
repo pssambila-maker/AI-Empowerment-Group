@@ -55,7 +55,7 @@ A premium, multi-page consultancy website for an AI Strategy, Data Science, and 
 /payment-cancelled       → User cancelled checkout page
 /portal                  → Protected client portal (paid members only)
 /accessibility           → WCAG 2.1 statement (footer link)
-/admin                   → Owner-only dashboard (leads, class registrations, contact inquiries) — not linked in nav, no public entry point
+/admin                   → Owner-only dashboard (leads, class registrations, contact inquiries, each with CSV export; free-class date/time/join-link editor) — not linked in nav, no public entry point
 ```
 
 ---
@@ -72,11 +72,12 @@ ai-empowerment-group/
 │   │   ├── NeuralPhoenixLogo.astro
 │   │   └── assessment/           # One component per funnel step
 │   ├── config/
-│   │   └── assessment.ts         # Questions, scoring, class schedule — single source of truth
+│   │   └── assessment.ts         # Questions, scoring, and DEFAULT_CLASS_SCHEDULE (fallback only —
+│   │                             # the live schedule lives in Firestore, editable from /admin)
 │   ├── lib/
 │   │   ├── firebase/client.ts    # Shared Firebase app/auth/db/functions init
-│   │   ├── assessment/           # Scoring, calendar, email templates, leads, mail, auth
-│   │   │                         # (scoring.ts, calendar.ts, emailTemplates.ts have *.test.ts alongside)
+│   │   ├── assessment/           # Scoring, calendar, email templates, leads, mail, auth, classSchedule
+│   │   │                         # (scoring.ts, calendar.ts, emailTemplates.ts, classSchedule.ts have *.test.ts alongside)
 │   │   ├── portal/                # Profile upsert, membership check, messaging
 │   │   └── contact/               # Contact form submission
 │   ├── layouts/

@@ -1,6 +1,6 @@
 # AI Empowerment Group — Project Context
 
-**Last Updated:** 2026-06-11
+**Last Updated:** 2026-07-29
 **Project Phase:** Live — core site + lead-gen assessment funnel deployed
 
 ---
@@ -220,22 +220,29 @@ record in Firestore along the way.
    Google Calendar / .ics download
 
 ### Recurring free class
-- **When:** Every Saturday, 9:00–11:00 AM Eastern Time (DST-aware)
-- **Where:** Zoom — join link configured in `src/config/assessment.ts`
+- **When:** A fixed, hand-set date (not auto-generated) — currently
+  August 16, 2026, 9:00–11:00 AM Eastern Time (DST-aware)
+- **Where:** Zoom — date/time/join link stored in Firestore
+  (`config/classSchedule`), editable from `/admin` without a redeploy;
+  `src/config/assessment.ts`'s `DEFAULT_CLASS_SCHEDULE` is only the
+  fallback used before that document exists or if the read fails
 - On registration, an invite email (subject, date/time, join link, calendar
   links) is queued via the Firestore `mail` collection and sent by the
   **Trigger Email** extension (Gmail SMTP)
 
 ### Architecture (modular — see `function.docx` for full detail)
 - `src/config/assessment.ts` — single source of truth for questions, scoring
-  weights, score-band insights, and the class schedule
+  weights, score-band insights, and the default (fallback) class schedule
 - `src/lib/assessment/` — pure logic modules: `scoring.ts`, `calendar.ts`,
-  `emailTemplates.ts`, `leads.ts`, `mail.ts`, `auth.ts`, `controller.ts`
+  `emailTemplates.ts`, `leads.ts`, `mail.ts`, `auth.ts`, `classSchedule.ts`
+  (Firestore fetch/save for the class schedule), `controller.ts`
 - `src/components/assessment/` — one Astro component per funnel step
 - `src/pages/assessment.astro` — assembles Layout + components + controller
 - `src/lib/firebase/client.ts` — shared Firebase app/auth/Firestore init
 - `firestore.rules` — `leads` and `mail` collections are create-only,
-  restricted to the signed-in user
+  restricted to the signed-in user; `config/{docId}` (site settings incl.
+  the class schedule) is readable by any signed-in user, writable only by
+  the hardcoded admin email (`isAdmin()`)
 
 ### Outstanding / owner-managed items
 - Firebase Console: Email Link sign-in must remain enabled (Authentication →

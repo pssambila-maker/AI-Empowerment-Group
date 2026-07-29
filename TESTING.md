@@ -11,7 +11,7 @@ npm test          # single run
 npm run test:watch  # re-runs on file change, useful while editing
 ```
 
-**What's covered:** `src/lib/assessment/scoring.ts` (score math, band boundaries, needle angle), `src/lib/assessment/calendar.ts` (the DST-aware "next Saturday 9am Eastern" logic — the single most bug-prone piece of pure logic in this codebase, tested across both EST and EDT and both sides of the "is it already past start time" edge case), `src/lib/assessment/emailTemplates.ts` (HTML-escaping, name handling).
+**What's covered:** `src/lib/assessment/scoring.ts` (score math, band boundaries, needle angle), `src/lib/assessment/calendar.ts` (the DST-aware occurrence/formatting logic — the single most bug-prone piece of pure logic in this codebase, tested across both EST and EDT), `src/lib/assessment/emailTemplates.ts` (HTML-escaping, name handling), `src/lib/assessment/classSchedule.ts` (mocks `firebase/firestore` — confirms a missing/partial Firestore document merges correctly over `DEFAULT_CLASS_SCHEDULE`, and that a **read failure falls back to the default instead of throwing**, so a rules regression or a rules-not-yet-deployed window can't break the assessment results screen for every visitor).
 
 **When to add a test here:** any time you add a new pure function to `src/lib/**` — something that takes inputs and returns an output with no Firebase/DOM/network calls. If it's pure, it's cheap to test and there's no excuse not to.
 
@@ -27,7 +27,7 @@ npm run test:rules
 
 This one command (`firebase emulators:exec`) starts the Firestore emulator, runs the test file, and shuts the emulator down again — no separate terminal needed.
 
-**What's covered:** every collection in `firestore.rules` — `leads`, `mail`, `users` (including the protected-fields check that stops a client from self-granting `membershipStatus: "paid"`), `conversations/{uid}/messages`, `contactSubmissions` — both the "this should be allowed" and "this should be denied" side of each rule, plus IDOR checks (can user B read/write user A's data) and the default-deny catch-all.
+**What's covered:** every collection in `firestore.rules` — `leads`, `mail`, `users` (including the protected-fields check that stops a client from self-granting `membershipStatus: "paid"`), `conversations/{uid}/messages`, `contactSubmissions`, `config/{docId}` (any signed-in user can read, only the admin email can write — this backs the `/admin` class-schedule editor) — both the "this should be allowed" and "this should be denied" side of each rule, plus IDOR checks (can user B read/write user A's data) and the default-deny catch-all.
 
 **When to add a test here:** any time you change `firestore.rules` — add a new collection, change a field requirement, adjust the protected-fields list. If a rule isn't tested here, the only way anyone finds out it's wrong is a live incident (see: this project's contact form silently failing for however long the rules were undeployed) or another manual pentest.
 
@@ -48,5 +48,7 @@ npm run test:e2e
 **Cleanup:** tests that create real data use obviously-fake identities (`e2e-test-suite@example.com`, `e2e-redirect-test-*@example.com`) and delete their own disposable auth accounts in a `finally` block. The one thing that's NOT cleaned up automatically is the contact-form test's Firestore document (`contactSubmissions` denies client-side deletes by design, same as it would for a real visitor) — check the Firebase Console occasionally and delete test submissions if they pile up.
 
 ## What's still manual (be honest about this)
+
+**`/admin` as the real owner is untestable by automation.** Access is gated by a single hardcoded email (`src/config/admin.ts`'s `ADMIN_EMAIL`), and no disposable test account can ever match it — so `e2e/admin.spec.ts` only covers the signed-out and signed-in-but-not-admin paths (redirect, "Not Authorized"). The dashboard's actual data loading, CSV export, and the class-schedule editor's save/load round-trip were verified by hand: unit + rules tests confirm the logic and permissions in isolation, and a real login as the owner in a browser is the only way to see the admin view itself render correctly. If you change anything under `src/pages/admin.astro`, do that manual pass — don't assume the test suite caught it.
 
 There is no CI pipeline running any of this automatically on push/PR — these all currently rely on someone remembering to run them locally. If you set up GitHub Actions (or similar) later, `npm test` and `npm run test:e2e` are the two to wire in first (rules tests need the JDK step too, which is more setup for a CI runner). Also, none of this replaces a real security review before a significant change — `web-pentest` (a Claude Code skill, not part of this repo) exists for a deeper, adversarial pass when it matters.
