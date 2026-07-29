@@ -22,7 +22,10 @@ import Layout from "../layouts/Layout.astro";
     </header>
 
     <section class="admin-section">
-      <h2>Assessment Leads <span id="leads-count" class="count-badge"></span></h2>
+      <h2>
+        Assessment Leads <span id="leads-count" class="count-badge"></span>
+        <button type="button" id="leads-csv-btn" class="csv-btn">Download CSV</button>
+      </h2>
       <div class="table-wrap">
         <table>
           <thead>
@@ -35,7 +38,10 @@ import Layout from "../layouts/Layout.astro";
     </section>
 
     <section class="admin-section">
-      <h2>Class Registrations <span id="registrations-count" class="count-badge"></span></h2>
+      <h2>
+        Class Registrations <span id="registrations-count" class="count-badge"></span>
+        <button type="button" id="registrations-csv-btn" class="csv-btn">Download CSV</button>
+      </h2>
       <div class="table-wrap">
         <table>
           <thead>
@@ -48,7 +54,10 @@ import Layout from "../layouts/Layout.astro";
     </section>
 
     <section class="admin-section">
-      <h2>Contact Inquiries <span id="inquiries-count" class="count-badge"></span></h2>
+      <h2>
+        Contact Inquiries <span id="inquiries-count" class="count-badge"></span>
+        <button type="button" id="inquiries-csv-btn" class="csv-btn">Download CSV</button>
+      </h2>
       <div class="table-wrap">
         <table>
           <thead>
@@ -66,7 +75,15 @@ import Layout from "../layouts/Layout.astro";
 <script>
   import { onAuthStateChanged } from "firebase/auth";
   import { getFirebaseAuth, getFirebaseDb } from "../lib/firebase/client";
-  import { fetchLeads, fetchClassRegistrations, fetchContactSubmissions } from "../lib/admin/data";
+  import {
+    fetchLeads,
+    fetchClassRegistrations,
+    fetchContactSubmissions,
+    type LeadRow,
+    type ClassRegistrationRow,
+    type ContactSubmissionRow,
+  } from "../lib/admin/data";
+  import { toCsv } from "../lib/admin/csv";
   import { ADMIN_EMAIL } from "../config/admin";
 
   const auth = getFirebaseAuth();
@@ -89,12 +106,31 @@ import Layout from "../layouts/Layout.astro";
     return d.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
   }
 
+  function downloadCsv(filename: string, content: string) {
+    const blob = new Blob([content], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  let latestLeads: LeadRow[] = [];
+  let latestRegistrations: ClassRegistrationRow[] = [];
+  let latestInquiries: ContactSubmissionRow[] = [];
+
   async function loadData() {
     const [leads, registrations, inquiries] = await Promise.all([
       fetchLeads(db),
       fetchClassRegistrations(db),
       fetchContactSubmissions(db),
     ]);
+    latestLeads = leads;
+    latestRegistrations = registrations;
+    latestInquiries = inquiries;
 
     const leadsBody = document.getElementById("leads-body") as HTMLElement;
     leadsBody.innerHTML = leads
@@ -128,6 +164,43 @@ import Layout from "../layouts/Layout.astro";
   }
 
   document.getElementById("refresh-btn")?.addEventListener("click", () => void loadData());
+
+  document.getElementById("leads-csv-btn")?.addEventListener("click", () => {
+    const csv = toCsv(latestLeads, [
+      { key: "createdAt", label: "Date", format: (v) => fmtDate(v as Date | null) },
+      { key: "fullName", label: "Name" },
+      { key: "email", label: "Email" },
+      { key: "phone", label: "Phone" },
+      { key: "role", label: "Role" },
+      { key: "score", label: "Score" },
+      { key: "category", label: "Category" },
+    ]);
+    downloadCsv(`leads-${Date.now()}.csv`, csv);
+  });
+
+  document.getElementById("registrations-csv-btn")?.addEventListener("click", () => {
+    const csv = toCsv(latestRegistrations, [
+      { key: "registeredAt", label: "Registered", format: (v) => fmtDate(v as Date | null) },
+      { key: "fullName", label: "Name" },
+      { key: "email", label: "Email" },
+      { key: "score", label: "Score" },
+      { key: "role", label: "Role" },
+      { key: "classDate", label: "Class Date", format: (v) => (v ? new Date(v as string).toLocaleDateString() : "—") },
+    ]);
+    downloadCsv(`class-registrations-${Date.now()}.csv`, csv);
+  });
+
+  document.getElementById("inquiries-csv-btn")?.addEventListener("click", () => {
+    const csv = toCsv(latestInquiries, [
+      { key: "createdAt", label: "Date", format: (v) => fmtDate(v as Date | null) },
+      { key: "name", label: "Name" },
+      { key: "email", label: "Email" },
+      { key: "country", label: "Country" },
+      { key: "inquiry", label: "Inquiry" },
+      { key: "message", label: "Message" },
+    ]);
+    downloadCsv(`contact-inquiries-${Date.now()}.csv`, csv);
+  });
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -220,6 +293,24 @@ import Layout from "../layouts/Layout.astro";
     font-weight: 500;
     color: var(--color-mid-grey);
   }
+
+  .csv-btn {
+    margin-left: auto;
+    background: none;
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 4px;
+    color: var(--color-gold);
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .csv-btn:hover:not(:disabled) { background: rgba(201,168,76,0.08); }
+  .csv-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .table-wrap {
     background: #1e1e1e;
