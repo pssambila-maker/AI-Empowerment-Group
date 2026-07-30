@@ -12,6 +12,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
     "astro": "^4.16.0",
     "firebase": "^10.14.0"
   },

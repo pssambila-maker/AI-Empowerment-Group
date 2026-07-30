@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /portal
+Disallow: /admin
+Disallow: /success
+Disallow: /payment-cancelled
+
+Sitemap: https://aiempoweredgroup.com/sitemap-index.xml
